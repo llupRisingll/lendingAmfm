@@ -1,0 +1,4 @@
+{
+  "css": ["Bootstrap/bootstrap.css"],
+  "js": ["Bootstrap/bootstrap.bundle.js"]
+}

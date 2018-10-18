@@ -1,0 +1,10 @@
+_layouts/*
+_models/*
+_presenters/*
+rut/cached/*
+
+# Allow
+!_layouts/barebone.twig
+!_layouts/defaults/
+!_models/.htaccess
+!_presenters/.htaccess

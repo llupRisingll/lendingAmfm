@@ -1,0 +1,4 @@
+<?php
+// Pass the command to the true CLI-Handler
+require_once "bin/CLIHandler.php";
+CLIHandler::init($argv);

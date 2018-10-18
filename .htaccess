@@ -1,0 +1,65 @@
+# Disable Directory Listing
+Options -Indexes
+
+# Block MD files
+<Files ~ "\.md$">
+  Order allow,deny
+  Deny from all
+</Files>
+# Block TWIG files
+<Files ~ ".twig">
+  Order allow,deny
+  Deny from all
+</Files>
+# Block GIT files
+<Files ~ ".gitignore">
+  Order allow,deny
+  Deny from all
+</Files>
+
+# Block LICENSE files
+<Files ~ "license">
+  Order allow,deny
+  Deny from all
+</Files>
+
+# Set the Default Index File
+# Example: DirectoryIndex first.html index.htm index.html index.php
+DirectoryIndex rut/bin/Loader.php
+
+# ---- Setup Document Error Pages ---- #
+# Bad_Request
+ErrorDocument 400 /_layouts/defaults/400.html
+# Unauthorized
+ErrorDocument 401 /_layouts/defaults/401.html
+# Forbidden
+ErrorDocument 403 /_layouts/defaults/404.html
+# Not_Found
+ErrorDocument 404 /_layouts/defaults/404.html
+# Internal_Server_Error
+ErrorDocument 500 /_layouts/defaults/500.html
+# ---- Setup Document Error Pages ---- #
+
+# Enable Rewriting
+RewriteEngine on
+
+# Prevents looping by checking an internal mod_rewrite variable REDIRECT_STATUS
+# which is set to 200 after first successful internal redirect.
+RewriteCond %{ENV:REDIRECT_STATUS} ^$
+
+# Replace public folder into the common folder
+RewriteRule ^js/(.*)$ /public/js/$1 [L,QSA]
+RewriteRule ^css/(.*)$ /public/css/$1 [L,QSA]
+RewriteRule ^fonts/(.*)$ /public/fonts/$1 [L,QSA]
+
+# Make Sure that the file does not exists
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+#RewriteRule ^& main/res [L]
+RewriteRule ^(.*)$ / [PT,L]
+
+# Redirect All request into the index page
+#RewriteRule (.*) main/res/s$1 [L]
+
+# Author: Luis Edward M. Miranda - 2017

@@ -1,0 +1,13 @@
+{
+    "production": false,
+    "time_record": false,
+    "cache": false,
+    "https": false,
+    "display_error": true,
+    "error_log": "errors.log",
+    "db_alpha": {
+        "username": "root",
+        "password": ""
+    },
+    "revisionID": "27b5d011269c9595afe76beed8666840"
+}

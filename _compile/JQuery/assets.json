@@ -1,0 +1,8 @@
+{
+  "js": [
+    "JQuery/jquery.js",
+    "JQuery/jquery.multisortable.js",
+    "JQuery/jquery-ui.js",
+    "JQuery/jquery-ui-normalizer.js"
+  ]
+}

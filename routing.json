@@ -1,0 +1,8 @@
+{
+    "~/^\\/(.*)\\/(.*)$/": "/app?un=$1&id=$2",
+    "/": "dashboardPresenter.php",
+    "/pending": "pendingAppPresenter.php",
+    "/payment": "paymentFormPresenter.php",
+    "/login": "loginPresenter.php",
+    "/signout": "LogoutPresenter.php"
+}

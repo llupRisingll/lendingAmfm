@@ -1,0 +1,17 @@
+# Block Access
+<Files ~ "composer.json">
+  Order allow,deny
+  Deny from all
+</Files>
+<Files ~ "composer.phar">
+  Order allow,deny
+  Deny from all
+</Files>
+<Files ~ "composer.lock">
+  Order allow,deny
+  Deny from all
+</Files>
+<Files ~ "rut">
+  Order allow,deny
+  Deny from all
+</Files>
