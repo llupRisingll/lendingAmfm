@@ -1,0 +1,44 @@
+
+<div class="container pt-5">
+    <div class="card w-50 m-auto">
+        <div class="card-header" style="border: 0; background-color: #71b6f0;">
+            <h3>Moonlight OFW Cooperative Login</h3>
+        </div>
+
+        {% if fc.title == "Authentication Error" %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>{{ fc.title }} </strong>
+                <span>{{ fc.message }}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
+
+
+        {% if fc.title == "Registration Success" %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ fc.title }} </strong>
+                <span>{{ fc.message }}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
+
+        <form action="#" method="post" style="padding: 13px;">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" placeholder="Enter Username" name="usn">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" placeholder="Enter Password" name="pwd">
+            </div>
+
+            <button class="btn btn-primary btn-block" type="submit" >Login</button>
+            <small style="float: right; margin-bottom: 10px;"><a href="#">Forgot Password?</a></small>
+        </form>
+    </div>
+</div>
