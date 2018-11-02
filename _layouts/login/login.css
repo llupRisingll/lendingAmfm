@@ -1,0 +1,27 @@
+.cd {
+    top: 44px;
+    margin: auto auto 50px;
+}
+
+.signup {
+    float: left;
+    width: 200px;
+    padding: 15px 0 0 5px;
+}
+
+.icon {
+    float: right;
+    width: 250px;
+    padding: 0 0 0 147px;
+    font-size: 60px;
+}
+.btn {
+    background-color: #4ba2ecc9;
+    border: 0;
+    color: black;
+    margin-bottom: 12px;
+}
+.btn:hover{
+    background-color: #3781bfc9;
+    color: black;
+}
