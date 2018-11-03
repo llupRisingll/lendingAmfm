@@ -64,8 +64,8 @@ class DataTableModel {
 		 * GET ALL OF THE DATA WITH SEARCH FILTER, ORDERING AND PAGE LIMITATION
 		 */
 		$direction = $order[0]["dir"];
-		$sql .= " ORDER BY :COLUMN_NAME $direction LIMIT $start, $length";
-		$dict[":COLUMN_NAME"] = $columns[$order[0]["column"]];
+		$columnName = $columns[$order[0]["column"]];
+		$sql .= " ORDER BY `$columnName` $direction LIMIT $start, $length";
 
 		// Process of querying data
 		$prepare = $database->mysqli_prepare($connection, $sql);
