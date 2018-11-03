@@ -1,4 +1,5 @@
 <?php
+
 class pendingAppPresenter {
     // HTTP Header Method: GET
     // Used to retrive a data or a view
@@ -7,7 +8,9 @@ class pendingAppPresenter {
 
         View::addScript("/_layouts/dashboard/js/jquery.min.js");
         View::addScript("/_layouts/dashboard/js/jquery.easing.js");
+        View::addScript("//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js");
 
+        View::addCSS("//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css");
         View::addCSS("http://".Route::domain()."/css/".md5("Bootstrap").".min.css");
         View::addScript("http://".Route::domain()."/js/".md5("Bootstrap").".min.js");
 

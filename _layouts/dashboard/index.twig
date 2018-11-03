@@ -39,38 +39,34 @@
         </div>
     </div>
 </nav>
+
 <!--Table-->
 <div class="container mt-3">
     <h3 class="text-muted pb-1" style="border-bottom: 1px solid #636c72">Client List</h3>
-    <table id="dataTable" class="table table-striped table-bordered" cellspacing="0">
+    <table id="dataTable" class="display table table-striped table-bordered" style="width:100%">
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Status</th>
-            <th>Type</th>
-            <th style="width: 230px">Actions</th>
+            <th>TID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Transaction Type</th>
+            <th></th>
         </tr>
         </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>kim luta</td>
-                <td>calauag city</td>
-                <td>unpaid</td>
-                <td>binary level</td>
-                <td>
-                    <button class="btn btn-outline-primary mr-2" data-toggle="modal" data-target="#approve">Approve</button>
-                    <button class="btn btn-outline-danger" data-toggle="modal" data-target="#decline" >Decline</button>
-                </td>
-            </tr>
-        </tbody>
+        <tfoot>
+        <tr>
+            <th>TransID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Transaction Type</th>
+            <th></th>
+        </tr>
+        </tfoot>
     </table>
 </div>
 
 <!--Modal Approve-->
-<div class="modal fade" id="approve" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="approve" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary">
@@ -90,7 +86,7 @@
 </div>
 
 <!--Modal Decline-->
-<div class="modal fade" id="decline" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="decline" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-danger">
@@ -108,3 +104,43 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+	//         Initialize the dataTable functionality
+	var table = $('#dataTable').DataTable({
+		"processing": true,
+		"serverSide": true,
+		"ajax": {
+			url :"/",
+			type: "POST"
+		},
+		"columnDefs": [{
+			"orderable":false,
+			"targets": -1,
+            "data": null,
+            "defaultContent":
+                "<button class='mr-1 approve btn btn-outline-primary' data-toggle='modal' data-target='#approve'>Approve</button>"+
+                "<button class='mr-1 decline btn btn-danger' data-toggle='modal' data-target='#approve'>Decline</button>"
+		}],
+		language: {
+			paginate: {
+				previous: "&#171;",
+				next: "&#187;"
+			}
+		}
+	});
+
+	// When the approve button is clicked
+	$('#dataTable tbody').on( 'click', 'button.approve', function () {
+		var data = table.row( $(this).parents('tr') ).data();
+		alert( data[0] +"'s salary is: "+ data[ 0 ] );
+	} );
+
+	// When the decline button is clicked
+	$('#dataTable tbody').on( 'click', 'button.decline', function () {
+		var data = table.row( $(this).parents('tr') ).data();
+		alert( data[0] +"'s salary is: "+ data[ 0 ] );
+	} );
+
+
+</script>
