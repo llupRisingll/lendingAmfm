@@ -1,4 +1,4 @@
 {
-  "css": ["dataTable/jquery.dataTables.min.css"],
+  "css": ["dataTable/jquery.dataTables.min.css", "dataTable/ExpandCollapse.css"],
   "js": ["dataTable/jquery.dataTables.min.js"]
 }

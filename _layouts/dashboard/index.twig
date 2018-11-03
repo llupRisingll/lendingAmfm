@@ -43,9 +43,10 @@
 <!--Table-->
 <div class="container mt-3">
     <h3 class="text-muted pb-1" style="border-bottom: 1px solid #636c72">Client List</h3>
-    <table id="dataTable" class="display table table-striped table-bordered" style="width:100%">
+    <table id="dataTable" class="display" style="width:100%">
         <thead>
         <tr>
+            <th></th>
             <th>TID</th>
             <th>First Name</th>
             <th>Last Name</th>
@@ -53,15 +54,7 @@
             <th></th>
         </tr>
         </thead>
-        <tfoot>
-        <tr>
-            <th>TID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Transaction Type</th>
-            <th></th>
-        </tr>
-        </tfoot>
+
     </table>
 </div>
 
@@ -106,15 +99,46 @@
 </div>
 
 <script type="text/javascript">
+	/* Formatting function for row details - modify as you need */
+	function format ( d ) {
+		// `d` is the original data object for the row
+		return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
+			'<tr>'+
+			'<td>Full name:</td>'+
+			'<td>'+d.name+'</td>'+
+			'</tr>'+
+			'<tr>'+
+			'<td>Extension number:</td>'+
+			'<td>'+d.extn+'</td>'+
+			'</tr>'+
+			'<tr>'+
+			'<td>Extra info:</td>'+
+			'<td>And any further details here (images etc)...</td>'+
+			'</tr>'+
+			'</table>';
+	}
+
 	//         Initialize the dataTable functionality
 	var table = $('#dataTable').DataTable({
 		"processing": true,
 		"serverSide": true,
+        "responsive": true,
 		"ajax": {
 			url :"/",
 			type: "POST"
 		},
-		"columnDefs": [{
+		"columns": [
+            {
+                "className":      'info-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+            },
+            {"data": "id"},
+            {"data": "fn"},
+            {"data": "ln"},
+            {"data": "type"},
+            {"data": "action",
 			"orderable":false,
 			"targets": -1,
             "data": null,
@@ -142,5 +166,22 @@
 		alert( data[0] +"'s salary is: "+ data[ 0 ] );
 	} );
 
+
+	// Add event listener for opening and closing details
+	$('#dataTable tbody').on('click', 'td.info-control', function () {
+		var tr = $(this).closest('tr');
+		var row = table.row( tr );
+
+		if ( row.child.isShown() ) {
+			// This row is already open - close it
+			row.child.hide();
+			tr.removeClass('shown');
+		}
+		else {
+			// Open this row
+			row.child( format(row.data()) ).show();
+			tr.addClass('shown');
+		}
+	} );
 
 </script>

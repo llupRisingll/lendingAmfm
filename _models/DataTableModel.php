@@ -14,10 +14,8 @@ class DataTableModel {
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
 
-
 		// DataTable Arrangement according to its index usage on the dataTable
-		$columns = array("id", "user_id", "parent_id", "type");
-
+		$columns = array("id", "fn", "ln", "type");
 
 		/**
 		 * GET ALL OF THE DATA WITHOUT FILTERING
@@ -37,7 +35,17 @@ class DataTableModel {
 		 * GET ALL OF THE DATA WITH SEARCH FILTER
 		 */
 		// Generate SQL according to parameters
-		$sql = "SELECT `id`, `user_id`, `parent_id`, `type` FROM `pending_requests` WHERE 1";
+		$sql = "
+		SELECT 
+			# Pending Request Columns
+			pr.`id`, pr.`user_id`, pr.`parent_id`, pr.`type`,
+			# Account Info Columns
+	    	ai.`fn`, ai.`ln`, ai.`ad`, ai.`email`, ai.`photo`, ai.`cn`, ai.`bdate` 
+			# Pending Request and Account Info Connectivity		
+		FROM `pending_requests` pr 
+			LEFT JOIN `account_info` ai 
+		ON pr.user_id=ai.`accnt_id`";
+
 		$dict = array();
 
 		if (!empty($search["value"])){
@@ -63,16 +71,12 @@ class DataTableModel {
 		$prepare = $database->mysqli_prepare($connection, $sql);
 		$database->mysqli_execute($prepare, $dict);
 
-		// Prepare the dataArray algorithm
+		// Prepare the dataArray algorithm by adding extra column
 		$dataArr = array();
 		foreach($database->mysqli_fetch_assoc($prepare) as $row){
-			$nestedData = array(
-				$row["id"], $row["user_id"], $row["parent_id"], $row["type"], null
-			);
-
-			array_push($dataArr, $nestedData);
+			$row["action"] = "";
+			array_push($dataArr, $row);
 		}
-
 
 		// Return the generated JSOn
 		return self::generateJSON($draw, $totalData, $totalFiltered, $dataArr);
@@ -105,7 +109,7 @@ class DataTableModel {
 			"data" => $data
 		);
 
-		return json_encode($generatedData);
+		return json_encode($generatedData, JSON_PRETTY_PRINT);
 	}
 }
     
