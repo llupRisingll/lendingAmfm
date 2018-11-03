@@ -44,13 +44,13 @@ class DataTableModel {
 			# Pending Request and Account Info Connectivity		
 		FROM `pending_requests` pr 
 			LEFT JOIN `account_info` ai 
-		ON pr.user_id=ai.`accnt_id`";
+		ON pr.user_id=ai.`accnt_id` WHERE 1";
 
 		$dict = array();
 
 		if (!empty($search["value"])){
-			$sql .= " AND `type` LIKE %:SEARCH_STRING%";
-			$dict[":SEARCH_STRING"] = Params::get("search")["value"];
+			$sql .= " AND ai.`fn` LIKE :SEARCH_STRING";
+			$dict[":SEARCH_STRING"] = "%".$search["value"]."%";
 		}
 
 		// Process of querying data
@@ -63,9 +63,9 @@ class DataTableModel {
 		/**
 		 * GET ALL OF THE DATA WITH SEARCH FILTER, ORDERING AND PAGE LIMITATION
 		 */
-		$sql .= " ORDER BY :COLUMN_NAME :DIRECTION LIMIT $start, $length";
+		$direction = $order[0]["dir"];
+		$sql .= " ORDER BY :COLUMN_NAME $direction LIMIT $start, $length";
 		$dict[":COLUMN_NAME"] = $columns[$order[0]["column"]];
-		$dict[":DIRECTION"] = $order[0]["dir"];
 
 		// Process of querying data
 		$prepare = $database->mysqli_prepare($connection, $sql);
