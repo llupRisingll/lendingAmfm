@@ -80,24 +80,27 @@
 
 <!--Modal Decline-->
 <div class="modal fade" id="decline" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header bg-danger">
+                <span class="text-white">Confirm Action</span>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <h6>Are you sure to decline this client ?</h6>
+                <h6 class="font-weight-normal">Are you sure to decline this client ?</h6>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-outline-danger">Decline</button>
+                <button type="button" class="btn btn-outline-secondary decline" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger decline">Decline</button>
             </div>
         </div>
     </div>
 </div>
 
+
+{# DataTable JavaScript Algorithm #}
 <script type="text/javascript">
 	/* Formatting function for row details - modify as you need */
 	function format ( d ) {
@@ -130,38 +133,39 @@
 			'</table>';
 	}
 
-	//         Initialize the dataTable functionality
+	// Initialize the dataTable functionality
 	var table = $('#dataTable').DataTable({
-		"processing": true,
-		"serverSide": true,
-        "responsive": true,
+		"processing": true, "serverSide": true, "responsive": true,
 		"ajax": {
-			url :"/",
-			type: "POST"
+			url :"/", type: "POST"
 		},
 		"columns": [
             {
-                "className":      'info-control',
-                "orderable":      false,
-                "data":           null,
+                "className": 'info-control',
+                "orderable": false,
+                "data": null,
                 "defaultContent": ''
-            },
-            {"data": "id"},
-            {"data": "fn"},
-            {"data": "ln"},
-            {"data": "type"},
-            {"data": "action",
-			"orderable":false,
-			"targets": -1,
-            "data": null,
-            "defaultContent":
-                "<button class='mr-1 approve btn btn-outline-primary' data-toggle='modal' data-target='#approve'>Approve</button>"+
-                "<button class='mr-1 decline btn btn-danger' data-toggle='modal' data-target='#approve'>Decline</button>"
-		}],
+            }, {
+            	"data": "id"
+            }, {
+			    "data": "fn"
+            },{
+			    "data": "ln"
+            }, {
+			    "data": "type"
+            }, {
+            	"data": "action",
+                "orderable":false,
+                "targets": -1,
+                "data": null,
+                "defaultContent":
+                    "<button class='mr-1 approve btn btn-outline-primary' data-toggle='modal' data-target='#approve'>Approve</button>"+
+                    "<button class='mr-1 decline btn btn-danger' data-toggle='modal' data-target='#decline'>Decline</button>"
+		    }
+        ],
 		language: {
 			paginate: {
-				previous: "&#171;",
-				next: "&#187;"
+				previous: "&#171;", next: "&#187;"
 			}
 		}
 	});
@@ -175,7 +179,10 @@
 	// When the decline button is clicked
 	$('#dataTable tbody').on( 'click', 'button.decline', function () {
 		var data = table.row( $(this).parents('tr') ).data();
-		alert( data["id"] +"'s salary is: "+ data[ 1 ] );
+
+		// Change the data id as the target within the confirmation modal
+        var ModalDeclineBtn = $("#decline").find("button.decline");
+		ModalDeclineBtn.attr("data-id", data["id"]);
 	} );
 
 
@@ -195,5 +202,48 @@
 			tr.addClass('shown');
 		}
 	} );
+</script>
 
+{# Modal Javascript Algorithm #}
+<script type="text/javascript">
+    function errorMethod() {
+	    {# Show the Server Error #}
+	    alert("Server Error: An internet connection distortion occur while trying to send your request. Please try again later");
+    }
+    
+    $("#decline .decline").on("click", function () {
+	    var dataID = $(this).data("id");
+	    // TODO: AJAX Request for decline
+
+	    {# Ajax Request to the binary request #}
+	    var JQXHR = $.ajax({
+		    url: "/",
+		    type: "POST",
+		    data: {"decline": dataID},
+		    beforeSend: function () {
+		    	// Sending Please wait...
+		    }
+	    })
+
+	    {# Get the server response when the request is successful  #}
+	    JQXHR.done(function(data){
+	    	// refresh page
+		    if (data == "1"){
+			    location.href = "/";
+			    return;
+		    }
+
+		    {# Show server error message #}
+		    errorMethod();
+	    });
+
+	    JQXHR.fail(errorMethod);
+    });
+
+    $("#approve .approve").on("click", function () {
+        var dataID = $(this).data("id");
+
+        // TODO : AJAX Request for approval
+	    alert("User has been approved: "+dataID );
+    });
 </script>

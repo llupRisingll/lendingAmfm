@@ -1,7 +1,5 @@
 <?php
 class dashboardPresenter {
-    // HTTP Header Method: GET
-    // Used to retrive a data or a view
     public static function get(){
         View::addVar("view_title", "Dashboard");
 
@@ -17,11 +15,27 @@ class dashboardPresenter {
 	    View::addScript("//".Route::domain()."/js/".md5("Bootstrap").".min.js");
     }
 
-    // HTTP Header Method: POST
-    // Usually used when to insert a new data
     public static function post(){
-    	Params::permit("search", "order", "start", "length", "draw");
+    	// Parameters to be accepted
+    	Params::permit("search", "order", "start", "length", "draw", "decline");
 
+	    // When declining a user
+    	if (Params::get("decline")){
+    		$status = TransactionsModel::declineTransaction(
+    			Params::get("decline")
+		    );
+
+    		// Do a server response whether it is successful or not.
+    		echo  $status ? "1" : "0";
+    		exit;
+	    }
+
+	    // When approving a user
+	    if (Params::get("approve")){
+    		exit;
+	    }
+
+	    // When getting the Transactions
     	$SERVER_RESPONSE = DataTableModel::getPendingTransactions(
     		Params::get("start"),
 		    Params::get("length"),
@@ -31,11 +45,9 @@ class dashboardPresenter {
 	    );
 
     	echo $SERVER_RESPONSE;
-
+		exit;
     }
 
-    // HTTP Header Method: PUT
-    // Usually used when about to update a data
     public static function put(){
         Route::returnCode(401);
     }
