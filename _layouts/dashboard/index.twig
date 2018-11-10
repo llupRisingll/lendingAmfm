@@ -180,6 +180,7 @@
 		ModalApproveBtn.attr("data-id", data["id"]);
 		ModalApproveBtn.attr("data-user_id", data["user_id"]);
 		ModalApproveBtn.attr("data-parent_id", data["parent_id"]);
+		ModalApproveBtn.attr("data-type", data["type"]);
 	} );
 
 	// When the decline button is clicked
@@ -247,6 +248,7 @@
 
     $("#approve .approve").on("click", function () {
         var dataID = $(this).data("id");
+        var dataType = $(this).data("type");
         var userID = $(this).data("user_id");
         var parentID = $(this).data("parent_id");
 
@@ -256,6 +258,7 @@
 		    type: "POST",
 		    data: {
 		    	"approve": dataID,
+		    	"type": dataType,
 			    "user_id": userID,
 			    "parent_id": parentID
 		    },

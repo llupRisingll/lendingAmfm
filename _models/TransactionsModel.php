@@ -28,7 +28,7 @@ class TransactionsModel {
 		}
 	}
 
-	public static function approveTransaction(String $tid, $userId, $parentID){
+	public static function approveTransaction(String $tid, $userId, $parentID, String $transType){
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
 
@@ -40,6 +40,7 @@ class TransactionsModel {
 		 * Our catch block will handle any exceptions that are thrown.
 		 */
 		try {
+
 			// Remove from the pending
 			$prepared = $database->mysqli_prepare($connection,
 				"DELETE FROM `pending_requests` WHERE `id`=:TRANSACTION_ID;"
@@ -48,22 +49,31 @@ class TransactionsModel {
 				":TRANSACTION_ID" => $tid
 			));
 
-			// Activate the binary account
-			$prepared = $database->mysqli_prepare($connection,
-				"UPDATE `accounts` SET `bin_active`='1' WHERE `id`=:USER_ID;"
-			);
-			$database->mysqli_execute($prepared, array(
-				":USER_ID" => $userId
-			));
+			// Approval of Binary Level
+			if ($transType == "binary"){
+				// Activate the binary account
+				$prepared = $database->mysqli_prepare($connection,
+					"UPDATE `accounts` SET `bin_active`='1' WHERE `id`=:USER_ID;"
+				);
+				$database->mysqli_execute($prepared, array(
+					":USER_ID" => $userId
+				));
 
-			// Add to the pending bin path
-			$prepared = $database->mysqli_prepare($connection,
-				"INSERT INTO `pending_binpath`(`invitee_id`, `invitor_id`) VALUES (:USER_ID, :PARENT_ID)"
-			);
-			$database->mysqli_execute($prepared, array(
-				":USER_ID" => $userId,
-				":PARENT_ID" => $parentID
-			));
+				// Add to the pending bin path
+				$prepared = $database->mysqli_prepare($connection,
+					"INSERT INTO `pending_binpath`(`invitee_id`, `invitor_id`) VALUES (:USER_ID, :PARENT_ID)"
+				);
+				$database->mysqli_execute($prepared, array(
+					":USER_ID" => $userId,
+					":PARENT_ID" => $parentID
+				));
+			}
+			// Approval of Uni level
+			else{
+				// Activate the uni level account
+
+				// Add to the uni path
+			}
 
 			// Commit the changes when no error found.
 			$database->mysqli_commit($connection);

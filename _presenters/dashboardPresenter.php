@@ -17,7 +17,7 @@ class dashboardPresenter {
 
     public static function post(){
     	// Parameters to be accepted
-    	Params::permit("search", "order", "start", "length", "draw", "decline", "approve", "parent_id", "user_id");
+    	Params::permit("search", "order", "start", "length", "draw", "decline", "approve", "parent_id", "user_id", "type");
 
 
 	    // When declining a user
@@ -32,11 +32,14 @@ class dashboardPresenter {
 	    }
 
 	    // When approving a user
-	    if (Params::get("approve") != false && Params::get("parent_id") != false && Params::get("user_id") != false){
-		    $status = TransactionsModel::approveTransaction(
+	    if (Params::get("approve") != false && Params::get("parent_id") != false && Params::get("user_id") != false &&
+		    Params::get("type") !== false){
+
+    		$status = TransactionsModel::approveTransaction(
 			    Params::get("approve"),
 			    Params::get("user_id"),
-			    Params::get("parent_id")
+			    Params::get("parent_id"),
+			    Params::get("type")
 		    );
 
 		    // Do a server response whether it is successful or not.
