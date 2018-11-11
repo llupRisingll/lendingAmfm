@@ -71,8 +71,27 @@ class TransactionsModel {
 			// Approval of Uni level
 			else{
 				// Activate the uni level account
+				$prepared = $database->mysqli_prepare($connection,
+					"UPDATE `accounts` SET `uni_active`='1' WHERE `id`=:USER_ID;"
+				);
+				$database->mysqli_execute($prepared, array(
+					":USER_ID" => $userId
+				));
 
 				// Add to the uni path
+				$prepared = $database->mysqli_prepare($connection, "
+              	INSERT INTO `unipath`(`anc`, `desc`, `parent`)
+					(SELECT `anc`, :USER_ID AS `desc`, :PARENT_ID AS `parent` FROM `binpath` WHERE `desc`=:PARENT_ID) 
+						UNION
+ 					(SELECT :USER_ID AS `enc`, :USER_ID AS `desc`, :PARENT_ID AS `parent`) 
+ 						ON DUPLICATE KEY UPDATE `parent`= :PARENT_ID;
+            		");
+
+
+				$database->mysqli_execute($prepared, array(
+					":USER_ID" => $userId,
+					":PARENT_ID" => $parentID
+				));
 			}
 
 			// Commit the changes when no error found.
@@ -91,12 +110,6 @@ class TransactionsModel {
 			$database->mysqli_rollback($connection);
 			return false;
 		}
-
-
-
-
-
-
 	}
 }
 
