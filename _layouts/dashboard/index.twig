@@ -103,35 +103,36 @@
 
 {# DataTable JavaScript Algorithm #}
 <script type="text/javascript">
+	function tableRow(title, content){
+		return $("<tr/>").append([
+			$("<td/>", {class: "font-weight-bold", text: title}),
+			$("<td/>", {class: "content", text: content})
+		]);
+	}
+
 	/* Formatting function for row details - modify as you need */
 	function format ( d ) {
-		// `d` is the original data object for the row
-		return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
-			'<tr>'+
-			'   <td class="font-weight-bold">Client ID:</td>'+
-			'   <td>'+d.user_id+'</td>'+
-			'</tr>'+
-			'<tr>'+
-			'   <td class="font-weight-bold">Invited By ID:</td>'+
-			'   <td>'+d.parent_id+'</td>'+
-			'</tr>'+
-			'<tr>'+
-			'   <td class="font-weight-bold">Address:</td>'+
-			'   <td>'+d.ad+'</td>'+
-			'</tr>'+
-			'<tr>'+
-			'   <td class="font-weight-bold">Email:</td>'+
-			'   <td>'+d.email+'</td>'+
-			'</tr>'+
-			'<tr>'+
-			'   <td class="font-weight-bold">Contact Number:</td>'+
-			'   <td>'+d.cn+'</td>'+
-			'</tr>'+
-			'<tr>'+
-			'   <td class="font-weight-bold">Birth date:</td>'+
-			'   <td>'+d.bdate+'</td>'+
-			'</tr>'+
-			'</table>';
+		{# `d` is the original data object for the row #}
+		var $template = $("<table/>", {cellpadding: 5, cellspacing: 0, border: 0}).css("paddingLeft", "50px");
+		$template.append(tableRow("Client ID:", d.user_id));
+		$template.append(tableRow("Invited by ID:", d.parent_id));
+
+		{# Add this row if the packg type is not null or does exists #}
+		if (d.packg_type){
+			switch (d.packg_type){
+				case "b": d.packg_type = "Bronze";  break;
+				case "s": d.packg_type = "Silver"; break;
+				case "g": d.packg_type = "Gold"; break;
+				case "d": d.packg_type = "Diamond"; break;
+				case "v": d.packg_type = "VIP"; break;
+			}
+			$template.append(tableRow("Package Type:", d.packg_type));
+		}
+		$template.append(tableRow("Address:", d.ad));
+		$template.append(tableRow("Email:", d.user_id));
+		$template.append(tableRow("Contact Number:", d.cn));
+		$template.append(tableRow("Birth date:", d.bdate));
+		return $template;
 	}
 
 	// Initialize the dataTable functionality

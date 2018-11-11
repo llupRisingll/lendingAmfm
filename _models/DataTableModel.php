@@ -1,6 +1,5 @@
 <?php
 class DataTableModel {
-
 	/**
 	 * Get the pending Transaction from database
 	 * @param String $start
@@ -31,7 +30,6 @@ class DataTableModel {
 		// Get the total amount of data without any filter or search
 		$totalData = $database->mysqli_num_rows($prepare);
 
-
 		/**
 		 * GET ALL OF THE DATA WITH SEARCH FILTER
 		 */
@@ -41,11 +39,16 @@ class DataTableModel {
 			# Pending Request Columns
 			pr.`id`, pr.`user_id`, pr.`parent_id`, pr.`type`,
 			# Account Info Columns
-	    	ai.`fn`, ai.`ln`, ai.`ad`, ai.`email`, ai.`photo`, ai.`cn`, ai.`bdate` 
+	    	ai.`fn`, ai.`ln`, ai.`ad`, ai.`email`, ai.`photo`, ai.`cn`, ai.`bdate`,
+	    	# Package Type
+	    	up.`packg_type`
 			# Pending Request and Account Info Connectivity		
 		FROM `pending_requests` pr 
 			LEFT JOIN `account_info` ai 
-		ON pr.user_id=ai.`accnt_id` WHERE 1";
+				ON pr.user_id=ai.`accnt_id` 
+			LEFT JOIN `uni_packg` up
+				ON up.`tid` = pr.`id`
+		WHERE 1";
 
 		$dict = array();
 
