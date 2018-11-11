@@ -8,6 +8,7 @@ class DataTableModel {
 	 * @param String $order
 	 * @param String $draw
 	 * @param String|null $search
+	 * @return array
 	 */
 	public static function getPendingTransactions($start, $length, $order, $draw, $search=null){
 		// Database connection
@@ -15,7 +16,7 @@ class DataTableModel {
 		$connection = DatabaseModel::getMainConnection();
 
 		// DataTable Arrangement according to its index usage on the dataTable
-		$columns = array("id", "fn", "ln", "type");
+		$columns = array("", "id", "fn", "ln", "type");
 
 		/**
 		 * GET ALL OF THE DATA WITHOUT FILTERING
