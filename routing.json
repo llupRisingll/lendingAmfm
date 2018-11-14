@@ -1,6 +1,6 @@
 {
     "/": "dashboardPresenter.php",
-    "/pending": "pendingAppPresenter.php",
+    "/accountList": "accountListPresenter.php",
     "/payment": "paymentFormPresenter.php",
     "/login": "loginPresenter.php",
     "/signout": "LogoutPresenter.php"
