@@ -6,31 +6,18 @@
 
 <div class="container mt-3">
     <h3 class="text-muted pb-1" style="border-bottom: 1px solid #636c72">All of the Clients</h3>
-    <table id="dataTable" class="table table-striped table-bordered" cellspacing="0">
+    <table id="dataTable" class="display" style="width:100%">
         <thead>
         <tr>
+            <th></th>
             <th>ID</th>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Status</th>
-            <th>Type</th>
-            <th style="width: 230px">Actions</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Active Loan</th>
+            <th></th>
         </tr>
         </thead>
-        <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Mark Cama</td>
-            <td>Naga city</td>
-            <td>Unpaid</td>
-            <td>Uni Level</td>
-            <td>
-                <button class="btn btn-outline-warning mr-1" data-toggle="modal" data-target="#lend">Lend</button>
-                <button class="btn btn-outline-success mr-1" data-target="" >Ledger</button>
-                <button class="btn btn-outline-primary " data-toggle="modal" data-target="#edit" >Edit</button>
-            </td>
-        </tr>
-        </tbody>
     </table>
 </div>
 
@@ -75,3 +62,84 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+	function tableRow(title, content){
+		return $("<tr/>").append([
+			$("<td/>", {class: "font-weight-bold", text: title}),
+			$("<td/>", {class: "content", text: content})
+		]);
+	}
+
+	/* Formatting function for row details - modify as you need */
+	function tableExpandFormat(d) {
+		{# `d` is the original data object for the row #}
+		var $template = $("<table/>", {cellpadding: 5, cellspacing: 0, border: 0}).css("paddingLeft", "50px");
+		$template.append(tableRow("Binary Status:", d.bin_active));
+		$template.append(tableRow("Unilevel Status:", d.uni_active));
+		$template.append(tableRow("Address:", d.ad));
+		$template.append(tableRow("Email:", d.email));
+		$template.append(tableRow("Contact Number:", d.cn));
+		$template.append(tableRow("Birth date:", d.bdate));
+		return $template;
+	}
+
+	// Initialize the dataTable functionality
+	var table = $('#dataTable').DataTable({
+		"processing": true, "serverSide": true, "responsive": true,
+		"ajax": {
+			url :"/accountList", type: "POST"
+		},
+		"columns": [
+			{
+				"className": 'info-control',
+				"orderable": false,
+				"data": null,
+				"defaultContent": ''
+			}, {
+				"data": "id"
+			}, {
+				"data": "fn"
+			},{
+				"data": "ln"
+			}, {
+				"data": "username"
+			},{
+				"data": "active_loan"
+			}, {
+				"data": "action",
+				"orderable":false,
+				"targets": -1,
+				"data": null,
+				"defaultContent":
+				"<button class='mr-1 approve btn btn-outline-primary' data-toggle='modal' data-target='#edit'>Edit</button>"+
+				"<button class='mr-1 decline btn btn-primary' data-toggle='modal' data-target='#ledger'>Ledger</button>"
+			}
+		],
+		"order": [[ 1, "desc" ]],
+		language: {
+			paginate: {
+				previous: "&#171;", next: "&#187;"
+			}
+		}
+	});
+
+
+	// Add event listener for opening and closing details
+	$('#dataTable tbody').on('click', 'td.info-control', function () {
+		var tr = $(this).closest('tr');
+		var row = table.row( tr );
+
+		if ( row.child.isShown() ) {
+			// This row is already open - close it
+			row.child.hide();
+			tr.removeClass('shown');
+		}
+		else {
+			// Open this row
+			row.child( tableExpandFormat(row.data()) ).show();
+			tr.addClass('shown');
+		}
+	} );
+
+</script>

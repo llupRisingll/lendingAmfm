@@ -22,7 +22,19 @@ class accountListPresenter {
     // HTTP Header Method: POST
     // Usually used when to insert a new data
     public function post(){
-        Route::returnCode(401);
+    	Params::permit("start", "length", "order", "draw", "search");
+
+	    // When getting the Transactions
+	    $SERVER_RESPONSE = DataTableModel::getAllAccounts(
+		    Params::get("start"),
+		    Params::get("length"),
+		    Params::get("order"),
+		    Params::get("draw"),
+		    Params::get("search")
+	    );
+
+	    echo $SERVER_RESPONSE;
+	    exit;
     }
 
     // HTTP Header Method: PUT
