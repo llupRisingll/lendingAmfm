@@ -21,43 +21,90 @@
     </table>
 </div>
 
-<!--Modal Lend-->
-<div class="modal fade" id="lend" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-warning">
-                <h5 class="modal-title" id="exampleModalLabel">Lend</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <h6>No content!</h6>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-outline-primary">Approve</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!--Modal Edit-->
-<div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary">
-                <h5 class="modal-title" id="exampleModalLabel">Edit</h5>
+                <h5 class="modal-title text-white">Edit Account Information</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <h6>No content!</h6>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-outline-primary">Approve</button>
+            <div class="modal-body" id="accordion">
+                <div class="card">
+                    <div class="c-pointer card-header" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <span class="text-primary">Basic Information</span>
+                    </div>
+
+                    <form action="/accountList" method="POST" id="collapseOne" class="collapse show p-3" aria-labelledby="headingOne" data-parent="#accordion">
+                        <input type="hidden" class="id" name="id">
+                        <div class="row pb-1">
+                            <div class="col-6 font-weight-bold">First Name:</div>
+                            <div class="col-6 font-weight-bold">
+                                <input type="text" name="fname" class="form-control" placeholder="Enter First Name" required>
+                            </div>
+                        </div>
+                        <div class="row pb-1">
+                            <div class="col-6 font-weight-bold">Last Name:</div>
+                            <div class="col-6 font-weight-bold">
+                                <input type="text" name="lname" class="form-control" placeholder="Enter Last Name" required>
+                            </div>
+                        </div>
+                        <div class="row pb-1">
+                            <div class="col-6 font-weight-bold">Contact Number:</div>
+                            <div class="col-6 font-weight-bold">
+                                <input type="text" name="cnumber" class="form-control" placeholder="Enter Contact Number" required>
+                            </div>
+                        </div>
+                        <div class="row pb-1">
+                            <div class="col-6 font-weight-bold">Address:</div>
+                            <div class="col-6 font-weight-bold">
+                                <input type="text" name="address" class="form-control" placeholder="Enter Address Info" required>
+                            </div>
+                        </div>
+                        <div class="row pb-1">
+                            <div class="col-6 font-weight-bold">Birth date:</div>
+                            <div class="col-6 font-weight-bold">
+                                <input type="date" name="bdate" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="float-right mt-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="c-pointer card-header" id="headingOne" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
+                        <span class="text-primary">Primary Information</span>
+                    </div>
+
+                    <form action="/accountList" method="POST" id="collapseTwo" class="collapse p-3" aria-labelledby="headingOne" data-parent="#accordion">
+                        <input type="hidden" class="id" name="id">
+                        <div class="row pb-1">
+                            <div class="col-6 font-weight-bold">Username:</div>
+                            <div class="col-6 font-weight-bold">
+                                <input type="text" name="username" class="form-control" placeholder="Enter Username" required>
+                            </div>
+                        </div>
+                        <div class="row pb-1">
+                            <div class="col-6 font-weight-bold">New Password (Optional):</div>
+                            <div class="col-6 font-weight-bold">
+                                <input type="text" name="password" class="form-control" placeholder="Enter New Password">
+                            </div>
+                        </div>
+                        <div class="row pb-1">
+                            <div class="col-6 font-weight-bold">Email:</div>
+                            <div class="col-6 font-weight-bold">
+                                <input type="text" name="email" class="form-control" placeholder="Enter Email Address" required>
+                            </div>
+                        </div>
+                        <div class="float-right mt-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -112,8 +159,8 @@
 				"targets": -1,
 				"data": null,
 				"defaultContent":
-				"<button class='mr-1 approve btn btn-outline-primary' data-toggle='modal' data-target='#edit'>Edit</button>"+
-				"<button class='mr-1 decline btn btn-primary' data-toggle='modal' data-target='#ledger'>Ledger</button>"
+				"<button class='mr-1 edit btn btn-outline-primary' data-toggle='modal' data-target='#edit'>Edit</button>"+
+				"<button class='mr-1 ledger btn btn-primary' data-toggle='modal' data-target='#ledger'>Ledger</button>"
 			}
 		],
 		"order": [[ 1, "desc" ]],
@@ -142,4 +189,31 @@
 		}
 	} );
 
+	// When the edit button is clicked
+	$('#dataTable tbody').on( 'click', 'button.edit', function () {
+		var data = table.row( $(this).parents('tr') ).data();
+        var editModal = $("#edit");
+
+		// Change the data id as the target within the confirmation modal
+		var targetID = editModal.find(".id");
+		targetID.val(data["id"]);
+
+		// Default Values - Basic Information
+        var fname = editModal.find("input[name='fname']");
+        var lname = editModal.find("input[name='lname']");
+        var cnumber = editModal.find("input[name='cnumber']");
+        var address = editModal.find("input[name='address']");
+        var bdate = editModal.find("input[name='bdate']");
+        fname.val(data["fn"]);
+        lname.val(data["ln"]);
+        cnumber.val(data["cn"]);
+        address.val(data["ad"]);
+        bdate.val(data["bdate"]);
+
+        // Default Values = Primary Information
+		var username = editModal.find("input[name='username']");
+		var email = editModal.find("input[name='email']");
+		username.val(data["username"]);
+		email.val(data["email"])
+	});
 </script>

@@ -17,14 +17,70 @@ class accountListPresenter {
 	    View::addCSS("//".Route::domain()."/css/".md5("Bootstrap").".min.css");
 	    View::addScript("//".Route::domain()."/js/".md5("Bootstrap").".min.js");
 
+	    View::addCSS("/_layouts/accountList/index.css");
+
     }
 
-    // HTTP Header Method: POST
-    // Usually used when to insert a new data
     public function post(){
-    	Params::permit("start", "length", "order", "draw", "search");
+    	Params::permit(
+    		// DataTable Parameters
+    		"start", "length", "order", "draw", "search", "fname",
+		    // Basic Info Parameters
+		    "id", "fname", "lname", "cnumber", "bdate", "address",
+		    // Primary Info Parameters
+		    "username", "password", "email"
+	    );
 
-	    // When getting the Transactions
+    	// Update Account Basic Information
+    	if (Params::get("id") != false && Params::get("fname") != false && Params::get("lname") != false &&
+		    Params::get("cnumber") != false && Params::get("bdate") != false && Params::get("address") != false){
+
+    		// Start the process
+    		AcctManagementModel::updateBasicInfo(
+    			Params::get("id"),
+			    Params::get("fname"),
+			    Params::get("lname"),
+			    Params::get("cnumber"),
+			    Params::get("bdate"),
+		        Params::get("address")
+		    );
+
+    		header("location: /accountList");
+    		exit;
+	    }
+
+	    // Update Account Primary Information
+	    if (Params::get("id") != false && Params::get("username") != false &&
+	        Params::get("email") != false){
+
+
+    		$pwd = Params::get("password");
+
+    		// When the Password has 8 - 32 characters,
+		    // Then Process with Password change
+    		if (strlen($pwd) > 7 && strlen($pwd) < 33){
+    			AcctManagementModel::updatePrimaryInfo(
+    				Params::get("id"),
+				    Params::get("username"),
+				    Params::get("email"),
+				    Params::get("password")
+			    );
+			    header("location: /accountList");
+    			exit;
+		    }
+
+		    // Process Without Password Change
+		    AcctManagementModel::updatePrimaryInfo(
+			    Params::get("id"),
+			    Params::get("username"),
+			    Params::get("email")
+		    );
+		    header("location: /accountList");
+    		exit;
+	    }
+
+
+	    // When getting the Transactions to the DataTable
 	    $SERVER_RESPONSE = DataTableModel::getAllAccounts(
 		    Params::get("start"),
 		    Params::get("length"),
