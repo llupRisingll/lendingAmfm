@@ -28,7 +28,17 @@ class TransactionsModel {
 		}
 	}
 
-	public static function approveTransaction(String $tid, $userId, $parentID, String $transType){
+	/**
+	 * Approving Transaction for Binary and Uni level Algorithm
+	 * @param String $tid
+	 * @param $userId
+	 * @param $parentID
+	 * @param String $transType
+	 * @param null $packType
+	 * @param null $loanAmount
+	 * @return bool
+	 */
+	public static function approveTransaction(String $tid, $userId, $parentID, String $transType, $packType=null, $loanAmount=null){
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
 
@@ -92,6 +102,24 @@ class TransactionsModel {
 					":USER_ID" => $userId,
 					":PARENT_ID" => $parentID
 				));
+
+				// Save the loan
+				$prepared = $database->mysqli_prepare($connection, "
+              		INSERT INTO `loan`
+              		(`cid`, `loan_type`, `loan_amount`, `gross_loan`, `loan_balance`, `loan_paid`, `lend_date`, `maturity_date`, `paid`) 
+              			VALUES 
+              		(:USER_ID, :PCKG_TYPE, :LOAN_AMOUNT, :GROSS_LOAN, :LOAN_BALANCE, 0, NOW(), NOW() + INTERVAL 1 YEAR, 'np')
+                ");
+
+
+				$database->mysqli_execute($prepared, array(
+					":USER_ID" => $userId,
+					":PCKG_TYPE" => $packType,
+					":LOAN_AMOUNT" => $loanAmount,
+					":GROSS_LOAN" => self::grossLoan($loanAmount),
+					":LOAN_BALANCE" => self::grossLoan($loanAmount),
+				));
+
 			}
 
 			// Commit the changes when no error found.
@@ -110,6 +138,14 @@ class TransactionsModel {
 			$database->mysqli_rollback($connection);
 			return false;
 		}
+	}
+
+	private static function grossLoan($loanAmount){
+		// Generate Total GrossLoan According to the loanAmount
+		$interest = 0.05;
+		$durationMonths = 12;
+
+		return (1+ ($interest * $durationMonths)) * $loanAmount;
 	}
 }
 

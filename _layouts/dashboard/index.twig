@@ -33,10 +33,14 @@
 		    </div>
 		    <div class="modal-body">
 			    <h6 class="font-weight-normal">Are you sure to approve this client ?</h6>
+			    <div id="loanAmount">
+			    </div>
+
+
 		    </div>
 		    <div class="modal-footer">
 			    <button type="button" class="btn btn-outline-secondary decline" data-dismiss="modal">Close</button>
-			    <button type="button" class="btn btn-primary approve">Approve</button>
+			    <button type="button" class="btn btn-primary approve">Confirm</button>
 		    </div>
 	    </div>
     </div>
@@ -64,6 +68,43 @@
 </div>
 
 
+<script type="text/javascript">
+	var LoanModel = (function () {
+		function LM() {}
+
+		LM.minLoan = function ($package_type) {
+			switch ($package_type){
+				case "b":
+					return 3000;
+				case "s":
+					return 10000;
+				case "g":
+					return 20000;
+				case "d":
+					return 40000;
+				case "v":
+					return 60000;
+			}
+		}
+
+		LM.maxLoan = function ($package_type) {
+			switch ($package_type){
+				case "b":
+					return 9999;
+				case "s":
+					return 19999;
+				case "g":
+					return 39999;
+				case "d":
+					return 59999;
+				case "v":
+					return "up";
+			}
+		}
+		return LM;
+	})();
+</script>
+
 {# DataTable JavaScript Algorithm #}
 <script type="text/javascript">
 	function tableRow(title, content){
@@ -74,7 +115,7 @@
 	}
 
 	/* Formatting function for row details - modify as you need */
-	function format ( d ) {
+	function tableExpandFormat(d) {
 		{# `d` is the original data object for the row #}
 		var $template = $("<table/>", {cellpadding: 5, cellspacing: 0, border: 0}).css("paddingLeft", "50px");
 		$template.append(tableRow("Client ID:", d.user_id));
@@ -96,6 +137,42 @@
 		$template.append(tableRow("Contact Number:", d.cn));
 		$template.append(tableRow("Birth date:", d.bdate));
 		return $template;
+	}
+
+	/**
+	 * Generate
+	 * @returns {jQuery}
+	 */
+	function loanAmountInputFormat($min, $max) {
+		var structure = [
+			'<h5>Enter Loan Amount</h5>',
+			'<div class="form-group">',
+				'<input type="number" min="',$min,'" max="',$max,'" placeholder="Enter Loan Amount between ',
+				$min,' and ',$max, '" class="form-control"/>',
+			'</div>',
+			'<div class="row">',
+				'<div class="col-6 font-weight-bold">Gross Loan:</div>',
+				'<div id="grossLoan" class="col-6 text-right">0</div>',
+			'</div>',
+			'<div class="row">',
+				'<div class="col-6 font-weight-bold">Monthly Due:</div>',
+				'<div id="monthlyDue" class="col-6 text-right">0</div>',
+			'</div>',
+			'<div class="row">',
+				'<div class="col-6 font-weight-bold">Maturity Date:</div>',
+				'<div id="maturityDate" class="col-6 text-right">',getMaturityDate(),'</div>',
+			'</div>'
+		];
+
+		return $(structure.join(''));
+	}
+	
+	function getMaturityDate() {
+		return new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString("en-US");
+	}
+
+	function getGrossLoan(loanAmount){
+		return ((0.05 * 12) + 1) * loanAmount;
 	}
 
 	// Initialize the dataTable functionality
@@ -142,11 +219,42 @@
 
 		// Change the data id as the target within the confirmation modal
 		var ModalApproveBtn = $("#approve").find("button.approve");
+		var ModalLoanAmount = $("#loanAmount");
+
 		ModalApproveBtn.attr("data-id", data["id"]);
 		ModalApproveBtn.attr("data-user_id", data["user_id"]);
 		ModalApproveBtn.attr("data-parent_id", data["parent_id"]);
 		ModalApproveBtn.attr("data-type", data["type"]);
-	} );
+		ModalApproveBtn.attr("data-packg_type", data["packg_type"]);
+
+		/**
+		 * There will be loan amount input when the transaction is a unilevel
+		 */
+		if (data["type"] === "unilevel"){
+			ModalLoanAmount.html(
+				loanAmountInputFormat(
+					LoanModel.minLoan(data["packg_type"]),
+					LoanModel.maxLoan(data["packg_type"])
+				)
+			);
+
+			// Automated GrossLoan Computation
+			ModalLoanAmount.find("input").on("keypress, keyup", function () {
+				var self = $(this);
+				if (self.val() > 0){
+					var grossAmount = getGrossLoan(self.val());
+
+					$("#grossLoan").text(Math.round(grossAmount * 100) / 100);
+					$("#monthlyDue").text(Math.round((grossAmount/12) * 100) / 100);
+				}else{
+					$("#grossLoan").val(0)
+					$("#monthlyDue").val(0)
+				}
+			});
+		}else{
+			ModalLoanAmount.html("");
+		}
+	});
 
 	// When the decline button is clicked
 	$('#dataTable tbody').on( 'click', 'button.decline', function () {
@@ -170,7 +278,7 @@
 		}
 		else {
 			// Open this row
-			row.child( format(row.data()) ).show();
+			row.child( tableExpandFormat(row.data()) ).show();
 			tr.addClass('shown');
 		}
 	} );
@@ -182,7 +290,7 @@
 	    {# Show the Server Error #}
 	    alert("Server Error: An internet connection distortion occur while trying to send your request. Please try again later");
     }
-    
+
     $("#decline .decline").on("click", function () {
 	    var dataID = $(this).data("id");
 
@@ -212,10 +320,32 @@
     });
 
     $("#approve .approve").on("click", function () {
-        var dataID = $(this).data("id");
-        var dataType = $(this).data("type");
-        var userID = $(this).data("user_id");
-        var parentID = $(this).data("parent_id");
+        var dataID = $(this).attr("data-id");
+        var dataType = $(this).attr("data-type");
+        var userID = $(this).attr("data-user_id");
+        var parentID = $(this).attr("data-parent_id");
+        var package_type = $(this).attr("data-packg_type");
+
+	    var loanAmount, min, max;
+	    if (dataType === "unilevel"){
+	        loanAmount = $(this).parents(".modal-content").find("#loanAmount input").val();
+
+		    min = LoanModel.minLoan(package_type);
+		    max = LoanModel.maxLoan(package_type);
+
+	        if (!(loanAmount > 0) || loanAmount.length < 1){
+	        	alert("Loan Amount is required");
+	        	return;
+	        }
+
+	        if (loanAmount < min || (loanAmount !== "up" && loanAmount > max)){
+	        	alert("Choose Loan Amount between "+min+" and "+max+" only. Thank you.");
+	        	return;
+	        }
+
+        }else{
+	    	loanAmount = undefined;
+	    }
 
 	    {# Ajax Request to the binary request #}
 	    var JQXHR = $.ajax({
@@ -225,7 +355,9 @@
 		    	"approve": dataID,
 		    	"type": dataType,
 			    "user_id": userID,
-			    "parent_id": parentID
+			    "parent_id": parentID,
+			    "package_type": package_type,
+			    "loan_amount": loanAmount
 		    },
 		    beforeSend: function () {
 			    // Sending Please wait...

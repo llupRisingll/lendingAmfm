@@ -17,7 +17,10 @@ class dashboardPresenter {
 
     public static function post(){
     	// Parameters to be accepted
-    	Params::permit("search", "order", "start", "length", "draw", "decline", "approve", "parent_id", "user_id", "type");
+    	Params::permit(
+    		"search", "order", "start", "length", "draw", "decline", "approve", "parent_id", "user_id", "type",
+		    "package_type", "loan_amount"
+	    );
 
 
 	    // When declining a user
@@ -39,7 +42,9 @@ class dashboardPresenter {
 			    Params::get("approve"),
 			    Params::get("user_id"),
 			    Params::get("parent_id"),
-			    Params::get("type")
+			    Params::get("type"),
+			    Params::get("package_type"),
+			    Params::get("loan_amount")
 		    );
 
 		    // Do a server response whether it is successful or not.
