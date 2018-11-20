@@ -15,15 +15,8 @@
 			<li class="nav-item {{ (page == "accounts") ? "active" : "" }}">
 				<a class="nav-link" href="/accountList">Account List</a>
 			</li>
-			<li class="nav-item dropdown">
-				<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" style="color: #9a9da0; text-decoration: none">
-					Reports
-				</a>
-				<div class="dropdown-menu">
-					<a href="#" class="dropdown-item">Collection Sheet</a>
-					<a href="#" class="dropdown-item">Collection Report</a>
-					<a href="/payment" class="dropdown-item">Payment Form</a>
-				</div>
+			<li class="nav-item {{ (page == "payment") ? "active" : "" }}">
+				<a class="nav-link" href="/payment">Payment Form</a>
 			</li>
 		</ul>
 	</div>

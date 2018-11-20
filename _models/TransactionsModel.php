@@ -36,9 +36,10 @@ class TransactionsModel {
 	 * @param String $transType
 	 * @param null $packType
 	 * @param null $loanAmount
+	 * @param int|null $loanDuration
 	 * @return bool
 	 */
-	public static function approveTransaction(String $tid, $userId, $parentID, String $transType, $packType=null, $loanAmount=null){
+	public static function approveTransaction(String $tid, $userId, $parentID, String $transType, $packType=null, $loanAmount=null, int $loanDuration=null){
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
 
@@ -106,9 +107,9 @@ class TransactionsModel {
 				// Save the loan
 				$prepared = $database->mysqli_prepare($connection, "
               		INSERT INTO `loan`
-              		(`cid`, `loan_type`, `loan_amount`, `gross_loan`, `loan_balance`, `loan_paid`, `lend_date`, `maturity_date`, `paid`) 
+              		(`cid`, `loan_type`, `loan_amount`, `monthly_due`, `gross_loan`, `loan_balance`, `loan_paid`, `lend_date`, `maturity_date`, `paid`) 
               			VALUES 
-              		(:USER_ID, :PCKG_TYPE, :LOAN_AMOUNT, :GROSS_LOAN, :LOAN_BALANCE, 0, NOW(), NOW() + INTERVAL 1 YEAR, 'np')
+              		(:USER_ID, :PCKG_TYPE, :LOAN_AMOUNT, :MONTHLY_DUE,:GROSS_LOAN, :LOAN_BALANCE, 0, NOW(), NOW() + INTERVAL $loanDuration MONTH, 'np')
                 ");
 
 
@@ -116,8 +117,9 @@ class TransactionsModel {
 					":USER_ID" => $userId,
 					":PCKG_TYPE" => $packType,
 					":LOAN_AMOUNT" => $loanAmount,
-					":GROSS_LOAN" => self::grossLoan($loanAmount),
-					":LOAN_BALANCE" => self::grossLoan($loanAmount),
+					":MONTHLY_DUE" => self::grossLoan($loanAmount, $loanDuration)/$loanDuration,
+					":GROSS_LOAN" => self::grossLoan($loanAmount, $loanDuration),
+					":LOAN_BALANCE" => self::grossLoan($loanAmount, $loanDuration),
 				));
 
 			}
@@ -140,11 +142,9 @@ class TransactionsModel {
 		}
 	}
 
-	private static function grossLoan($loanAmount){
+	private static function grossLoan($loanAmount, $durationMonths=8){
 		// Generate Total GrossLoan According to the loanAmount
 		$interest = 0.05;
-		$durationMonths = 12;
-
 		return (1+ ($interest * $durationMonths)) * $loanAmount;
 	}
 }

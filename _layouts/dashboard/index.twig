@@ -67,8 +67,7 @@
     </div>
 </div>
 
-
-<script type="text/javascript">
+<script type="text/javascript" async>
 	var LoanModel = (function () {
 		function LM() {}
 
@@ -146,9 +145,21 @@
 	function loanAmountInputFormat($min, $max) {
 		var structure = [
 			'<h5>Enter Loan Amount</h5>',
-			'<div class="form-group">',
-				'<input type="number" min="',$min,'" max="',$max,'" placeholder="Enter Loan Amount between ',
-				$min,' and ',$max, '" class="form-control"/>',
+			'<div class="form-group clearfix">',
+				'<input type="number" min="',$min,'" max="',$max,'" value="',$min,'" placeholder="Enter Loan Amount between ',
+				$min,' and ',$max, '" class="form-control loanAmount"/>',
+				'<span class="text-secondary float-right font-italic">Enter Loan Amount between ',
+				$min,' and ',$max, '</span>',
+			'</div>',
+			'<div class="form-group clearfix mb-0">',
+				'<h5 class="float-left">Loan Duration</h5>',
+				'<div class="float-right">',
+					'<b class="float-right mt-2 ml-2"> Months</b>',
+					'<input type="number" id="slideValue" min="8" max="16" value="8"  class="form-control w-50 float-right">',
+				'</div>',
+			'</div>',
+			'<div class="form-group mt-2">',
+				'<div id="slider" class=""></div>',
 			'</div>',
 			'<div class="row">',
 				'<div class="col-6 font-weight-bold">Gross Loan:</div>',
@@ -160,19 +171,59 @@
 			'</div>',
 			'<div class="row">',
 				'<div class="col-6 font-weight-bold">Maturity Date:</div>',
-				'<div id="maturityDate" class="col-6 text-right">',getMaturityDate(),'</div>',
+				'<div id="maturityDate" class="col-6 text-right"></div>',
 			'</div>'
 		];
 
-		return $(structure.join(''));
+
+		var structure = $(structure.join(''));
+		var slider = structure.find("#slider");
+		var sliderValue = structure.find("#slideValue");
+		slider.slider({
+			range: "min",
+			min: 8,
+			max: 16,
+			value: 8,
+			slide: function( event, ui ) {
+				sliderValue.val( ui.value );
+				setTimeout(function () {
+					$(structure).find(".loanAmount").trigger("keyup");
+				}, 0)
+			}
+		});
+		sliderValue.val( slider.slider( "value" ) );
+
+		// Dynamically Update the Slider
+		sliderValue.on("change keyup keypress", function () {
+			if ($(this).val() > 16 || $(this).val() < 8){
+				$(this).val(16);
+			}else{
+				slider.slider("value", $(this).val());
+				setTimeout(function () {
+					$(structure).find(".loanAmount").trigger("keyup");
+				}, 0)
+			}
+		})
+
+		// Trigger Key up to auto Calculate
+		setTimeout(function () {
+			sliderValue.trigger("keyup");
+		}, 0)
+		return structure
 	}
 	
-	function getMaturityDate() {
-		return new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString("en-US");
+	function getMaturityDate(months) {
+		months = Number(months) || 8;
+		var date = new Date(new Date().setMonth(new Date().getMonth() + months)).toLocaleDateString("en-US");
+		return date;
+	}
+
+	function getMonthlyDue(grossAmount){
+		return (grossAmount/$("#slideValue").val());
 	}
 
 	function getGrossLoan(loanAmount){
-		return ((0.05 * 12) + 1) * loanAmount;
+		return ((0.05 * $("#slideValue").val()) + 1) * loanAmount;
 	}
 
 	// Initialize the dataTable functionality
@@ -239,18 +290,37 @@
 			);
 
 			// Automated GrossLoan Computation
-			ModalLoanAmount.find("input").on("keypress, keyup", function () {
+			ModalLoanAmount.find(".loanAmount").on("change, keypress, keyup", function () {
 				var self = $(this);
 				if (self.val() > 0){
 					var grossAmount = getGrossLoan(self.val());
-
 					$("#grossLoan").text(Math.round(grossAmount * 100) / 100);
-					$("#monthlyDue").text(Math.round((grossAmount/12) * 100) / 100);
+					$("#monthlyDue").text(Math.round(getMonthlyDue(grossAmount) * 100) / 100);
+					$("#maturityDate").text(getMaturityDate($("#slideValue").val()));
 				}else{
-					$("#grossLoan").val(0)
-					$("#monthlyDue").val(0)
+					$("#grossLoan").text(0);
+					$("#monthlyDue").text(0);
+					$("#maturityDate").text(getMaturityDate(8));
+
+				}
+
+			});
+			// Automated GrossLoan Computation
+			ModalLoanAmount.find("#slideValue").on("change, keypress, keyup", function () {
+				var self = ModalLoanAmount.find(".loanAmount");
+				if (self.val() > 0){
+					var grossAmount = getGrossLoan(self.val());
+					$("#grossLoan").text(Math.round(grossAmount * 100) / 100);
+					$("#monthlyDue").text(Math.round(getMonthlyDue(grossAmount) * 100) / 100);
+					$("#maturityDate").text(getMaturityDate($("#slideValue").val()));
+				}else{
+					$("#grossLoan").text(0);
+					$("#monthlyDue").text(0);
+					$("#maturityDate").text(getMaturityDate(8));
 				}
 			});
+
+
 		}else{
 			ModalLoanAmount.html("");
 		}
@@ -326,9 +396,9 @@
         var parentID = $(this).attr("data-parent_id");
         var package_type = $(this).attr("data-packg_type");
 
-	    var loanAmount, min, max;
+	    var loanAmount, monthlyDue, loanDuration, min, max;
 	    if (dataType === "unilevel"){
-	        loanAmount = $(this).parents(".modal-content").find("#loanAmount input").val();
+	        loanAmount = $(this).parents(".modal-content").find("#loanAmount .loanAmount").val();
 
 		    min = LoanModel.minLoan(package_type);
 		    max = LoanModel.maxLoan(package_type);
@@ -343,8 +413,13 @@
 	        	return;
 	        }
 
+	        monthlyDue = getMonthlyDue(getGrossLoan(loanAmount));
+		    loanDuration = $("#slideValue").val();
+
         }else{
 	    	loanAmount = undefined;
+		    monthlyDue = undefined;
+		    loanDuration = undefined;
 	    }
 
 	    {# Ajax Request to the binary request #}
@@ -357,7 +432,9 @@
 			    "user_id": userID,
 			    "parent_id": parentID,
 			    "package_type": package_type,
-			    "loan_amount": loanAmount
+			    "loan_amount": loanAmount,
+			    "loan_duration": loanDuration
+
 		    },
 		    beforeSend: function () {
 			    // Sending Please wait...

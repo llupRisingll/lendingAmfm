@@ -4,7 +4,7 @@ class dashboardPresenter {
         View::addVar("view_title", "Dashboard");
 
         // Import Jquery JS Library
-	    View::addScript("http://".Route::domain()."/js/".md5("JQueryOnly").".min.js");
+	    View::addScript("http://".Route::domain()."/js/".md5("JQuery").".min.js");
 
 	    // Import dataTable library
 	    View::addScript("//".Route::domain()."/js/".md5("dataTable").".min.js");
@@ -12,6 +12,7 @@ class dashboardPresenter {
 
 	    // Import Bootstrap
 	    View::addCSS("//".Route::domain()."/css/".md5("Bootstrap").".min.css");
+	    View::addCSS("/_layouts/dashboard/css/jquery-ui.css");
 	    View::addScript("//".Route::domain()."/js/".md5("Bootstrap").".min.js");
     }
 
@@ -19,9 +20,8 @@ class dashboardPresenter {
     	// Parameters to be accepted
     	Params::permit(
     		"search", "order", "start", "length", "draw", "decline", "approve", "parent_id", "user_id", "type",
-		    "package_type", "loan_amount"
+		    "package_type", "loan_amount", "loan_duration"
 	    );
-
 
 	    // When declining a user
     	if (Params::get("decline") != false){
@@ -44,7 +44,9 @@ class dashboardPresenter {
 			    Params::get("parent_id"),
 			    Params::get("type"),
 			    Params::get("package_type"),
-			    Params::get("loan_amount")
+			    Params::get("loan_amount"),
+			    Params::get("loan_duration")
+
 		    );
 
 		    // Do a server response whether it is successful or not.
