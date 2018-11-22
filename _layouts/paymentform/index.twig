@@ -6,31 +6,21 @@
 <div class="container mt-3">
     <div style="border-bottom: 1px solid black; margin-bottom: 10px;">
         <h3 class="text-muted pb-1" style=" display: inline-block;">Active Accounts</h3>
-        <div class="dropdown float-right" style="display: inline-block; ">
-            <a href="" class="dropdown-toggle" data-toggle="dropdown" style="text-decoration: none;">
-                Active Accounts
-            </a>
-            <div class="dropdown-menu dropdown-menu-right">
-                <a href="#" class="dropdown-item">Active Accounts <span class="sr-only">(current)</span></a>
-                <a href="#" class="dropdown-item">With Arrears</a>
-                <a href="/payment" class="dropdown-item">Matured Accounts</a>
-            </div>
-        </div>
     </div>
     <!--Active accounts-->
-    <table id="dataTable" class="table table-striped table-bordered" cellspacing="0">
+    <table id="activeAccount" class="table table-striped table-bordered" cellspacing="0">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Daily Due</th>
-                <th>Amount Paid</th>
+                <th></th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Monthly Due</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <th scope="row">1</th>
+                <th>1</th>
                 <td>Kim jay luta</td>
                 <td>Uni Level</td>
                 <td>09/21/1998</td>
@@ -42,27 +32,16 @@
     <!--With Arrears-->
     <div style="border-bottom: 1px solid black; margin-bottom: 10px;">
         <h3 class="text-muted pb-1" style=" display: inline-block;">With Arrears </h3>
-        <div class="dropdown float-right" style="display: inline-block; ">
-            <a href="" class="dropdown-toggle" data-toggle="dropdown" style="text-decoration: none;">
-                With Arrears
-            </a>
-            <div class="dropdown-menu dropdown-menu-right">
-                <a href="#" class="dropdown-item">Active Accounts <span class="sr-only">(current)</span></a>
-                <a href="#" class="dropdown-item">With Arrears</a>
-                <a href="/payment" class="dropdown-item">Matured Accountx</a>
-            </div>
-        </div>
     </div>
     <table id="dataTable" class="table table-striped table-bordered" cellspacing="0">
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Daily Due</th>
+            <th></th>
+            <th>FirstName</th>
+            <th>LastName</th>
             <th>Arrears</th>
-            <th>Amount Paid</th>
-            <th>Total Amount Due</th>
+            <th>Total Due</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
@@ -72,49 +51,14 @@
             <td>Uni Level</td>
             <td>40</td>
             <td>09/21/1998</td>
-            <td><b>PHP</b> 1,000</td>
-            <td><b>PHP</b> 10,000</td>
-        </tr>
-        </tbody>
-    </table>
-
-
-    <!--With Arrears-->
-    <div style="border-bottom: 1px solid black; margin-bottom: 10px;">
-        <h3 class="text-muted pb-1" style=" display: inline-block;">Matured Accounts</h3>
-        <div class="dropdown float-right" style="display: inline-block; ">
-            <a href="" class="dropdown-toggle" data-toggle="dropdown" style="text-decoration: none;">
-                Matured Accounts
-            </a>
-            <div class="dropdown-menu dropdown-menu-right">
-                <a href="#" class="dropdown-item">Active Accounts <span class="sr-only">(current)</span></a>
-                <a href="#" class="dropdown-item">With Arrears</a>
-                <a href="/payment" class="dropdown-item">Matured Accountx</a>
-            </div>
-        </div>
-    </div>
-    <table id="dataTable" class="table table-striped table-bordered" cellspacing="0">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Arrears</th>
-            <th>Total Amount Due</th>
-            <th>Outstanding Balance</th>
-            <th>Amount Paid</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Luis Miranda</td>
-            <td>Uni Level</td>
-            <td>40</td>
-            <td><b>PHP</b> 1,000</td>
-            <td><b>PHP</b> 10,000</td>
             <td><b>PHP</b> 10,000</td>
         </tr>
         </tbody>
     </table>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+    });
+</script>
