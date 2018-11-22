@@ -294,8 +294,8 @@
 				var self = $(this);
 				if (self.val() > 0){
 					var grossAmount = getGrossLoan(self.val());
-					$("#grossLoan").text(Math.round(grossAmount * 100) / 100);
-					$("#monthlyDue").text(Math.round(getMonthlyDue(grossAmount) * 100) / 100);
+					$("#grossLoan").text(Math.ceil(grossAmount));
+					$("#monthlyDue").text(Math.ceil(getMonthlyDue(grossAmount)));
 					$("#maturityDate").text(getMaturityDate($("#slideValue").val()));
 				}else{
 					$("#grossLoan").text(0);
@@ -310,8 +310,8 @@
 				var self = ModalLoanAmount.find(".loanAmount");
 				if (self.val() > 0){
 					var grossAmount = getGrossLoan(self.val());
-					$("#grossLoan").text(Math.round(grossAmount * 100) / 100);
-					$("#monthlyDue").text(Math.round(getMonthlyDue(grossAmount) * 100) / 100);
+					$("#grossLoan").text(Math.ceil(grossAmount));
+					$("#monthlyDue").text(Math.ceil(getMonthlyDue(grossAmount)));
 					$("#maturityDate").text(getMaturityDate($("#slideValue").val()));
 				}else{
 					$("#grossLoan").text(0);

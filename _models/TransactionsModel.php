@@ -117,7 +117,7 @@ class TransactionsModel {
 					":USER_ID" => $userId,
 					":PCKG_TYPE" => $packType,
 					":LOAN_AMOUNT" => $loanAmount,
-					":MONTHLY_DUE" => self::grossLoan($loanAmount, $loanDuration)/$loanDuration,
+					":MONTHLY_DUE" => ceil(self::grossLoan($loanAmount, $loanDuration)/$loanDuration),
 					":GROSS_LOAN" => self::grossLoan($loanAmount, $loanDuration),
 					":LOAN_BALANCE" => self::grossLoan($loanAmount, $loanDuration),
 				));
@@ -145,7 +145,7 @@ class TransactionsModel {
 	private static function grossLoan($loanAmount, $durationMonths=8){
 		// Generate Total GrossLoan According to the loanAmount
 		$interest = 0.05;
-		return (1+ ($interest * $durationMonths)) * $loanAmount;
+		return ceil((1+ ($interest * $durationMonths)) * $loanAmount);
 	}
 }
 
