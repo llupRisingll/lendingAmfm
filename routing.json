@@ -3,5 +3,6 @@
     "/accountList": "accountListPresenter.php",
     "/payment": "paymentFormPresenter.php",
     "/login": "loginPresenter.php",
-    "/signout": "LogoutPresenter.php"
+    "/signout": "LogoutPresenter.php",
+    "/withdrawals": "WithdrawalsPresenter.php"
 }
