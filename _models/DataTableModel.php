@@ -22,7 +22,7 @@ class DataTableModel {
 		 * GET ALL OF THE DATA WITHOUT FILTERING
 		 */
 		// Select all of the data in the pending table
-		$sql = "SELECT `id` FROM `pending_requests` WHERE 1";
+		$sql = "SELECT `id` FROM `accounts` WHERE 1";
 
 		// Process of querying data
 		$prepare = $database->mysqli_prepare($connection, $sql);
@@ -174,6 +174,99 @@ class DataTableModel {
 		return self::generateJSON($draw, $totalData, $totalFiltered, $dataArr);
 	}
 
+
+	public static function fetchAllLoans($start, $length, $order, $draw, $search=null, $type){
+		// Database connection
+		$database = DatabaseModel::initConnections();
+		$connection = DatabaseModel::getMainConnection();
+
+		// DataTable Arrangement according to its index usage on the dataTable
+		$columns = array("", "fn", "ln");
+
+		/**
+		 * GET ALL OF THE DATA WITHOUT FILTERING
+		 */
+		// Select all of the data in the pending table
+		$sql = "SELECT `id` FROM `loan` WHERE 1";
+
+		// Process of querying data
+		$prepare = $database->mysqli_prepare($connection, $sql);
+		$database->mysqli_execute($prepare);
+
+		// Get the total amount of data without any filter or search
+		$totalData = $database->mysqli_num_rows($prepare);
+
+		/**
+		 * GET ALL OF THE DATA WITH SEARCH FILTER
+		 */
+		// Generate SQL according to parameters
+		$sql = "
+		SELECT ai.*, past_due, matured, loan_balance, lend_date, maturity_date, paid, monthly_due, loan_paid, l.id AS loan_id, loan_amount, gross_loan, IF (matured, past_due, past_due+monthly_due) AS total_due
+		FROM
+			(SELECT 		
+			    @org_lend_date := `lend_date` AS lend_date,
+			    @lend_date := DATE_FORMAT(@org_lend_date, \"%Y-%m-1\"),
+			    @org_maturity_date := `maturity_date` AS maturity_date,
+			    @maturity_date := TIMESTAMPDIFF(MONTH, @org_maturity_date, SYSDATE()),
+			    @matured := IF (@maturity_date >= 1,true,false) as matured,
+			    @loan_duration := TIMESTAMPDIFF(MONTH, @org_lend_date,  @org_maturity_date),
+				@curr_date :=  DATE_FORMAT(SYSDATE(), \"%Y-%m-1\"),
+			    @duration := IF (@matured, @loan_duration, TIMESTAMPDIFF(MONTH, @lend_date, @curr_date) - 1),
+			    @durationUS := IF(@duration < 0, 0, @duration),
+				@monthly_due := monthly_due AS monthly_due,
+			    @loan_paid := loan_paid as loan_paid,
+			    (@monthly_due * @durationUS) - @loan_paid as past_due,
+			    
+			    # Normal Fetch
+			    cid, loan_balance, loan_amount, gross_loan, paid, id
+			FROM loan) l
+		INNER JOIN account_info ai ON ai.accnt_id = l.cid
+		WHERE 1";
+
+
+		if ($type == "active"){
+			$sql .= " AND past_due=0 AND matured=0";
+		}
+
+		if ($type == "arrears"){
+			$sql .= " AND past_due>0 AND matured=0";
+		}
+
+		if ($type == "matured"){
+			$sql .= " AND matured=1";
+		}
+
+		$dict = array();
+
+		if (!empty($search["value"])){
+			$sql .= " AND ai.`fn` LIKE :SEARCH_STRING";
+			$dict[":SEARCH_STRING"] = "%".$search["value"]."%";
+		}
+
+		// Process of querying data
+		$prepare = $database->mysqli_prepare($connection, $sql);
+		$database->mysqli_execute($prepare, $dict);
+
+		// Get the total amount of data without any filter or search
+		$totalFiltered = $database->mysqli_num_rows($prepare);
+
+		/**
+		 * GET ALL OF THE DATA WITH SEARCH FILTER, ORDERING AND PAGE LIMITATION
+		 */
+		$direction = $order[0]["dir"];
+		$columnName = $columns[$order[0]["column"]];
+		$sql .= " ORDER BY `$columnName` $direction LIMIT $start, $length";
+
+		// Process of querying data
+		$prepare = $database->mysqli_prepare($connection, $sql);
+		$database->mysqli_execute($prepare, $dict);
+
+		// Prepare the dataArray algorithm by adding extra column
+		$dataArr = $database->mysqli_fetch_assoc($prepare);
+
+		// Return the generated JSOn
+		return self::generateJSON($draw, $totalData, $totalFiltered, $dataArr);
+	}
 
 	/**
 	 * Generate JSON from the given parameters

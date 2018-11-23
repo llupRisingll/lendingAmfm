@@ -5,18 +5,39 @@ class paymentFormPresenter {
     public function get(){
         View::addVar("view_title", "Payment Form");
 
-        View::addScript("/_layouts/dashboard/js/jquery.min.js");
-        View::addScript("/_layouts/dashboard/js/jquery.easing.js");
+	    View::addVar("view_title", "Account List");
 
-        View::addCSS("http://".Route::domain()."/css/".md5("Bootstrap").".min.css");
-        View::addScript("http://".Route::domain()."/js/".md5("Bootstrap").".min.js");
+	    // Import Jquery JS Library
+	    View::addScript("http://".Route::domain()."/js/".md5("JQueryOnly").".min.js");
+
+	    // Import dataTable library
+	    View::addScript("//".Route::domain()."/js/".md5("dataTable").".min.js");
+	    View::addCSS("//".Route::domain()."/css/".md5("dataTable").".min.css");
+
+	    // Import Bootstrap
+	    View::addCSS("//".Route::domain()."/css/".md5("Bootstrap").".min.css");
+	    View::addScript("//".Route::domain()."/js/".md5("Bootstrap").".min.js");
+
 
     }
 
-    // HTTP Header Method: POST
-    // Usually used when to insert a new data
-    public function post(){
-        Route::returnCode(401);
+    public function post(){// Parameters to be accepted
+	    Params::permit(
+		    "search", "order", "start", "length", "draw", "type"
+	    );
+
+	    // When getting the Transactions
+	    $SERVER_RESPONSE = DataTableModel::fetchAllLoans(
+		    Params::get("start"),
+		    Params::get("length"),
+		    Params::get("order"),
+		    Params::get("draw"),
+		    Params::get("search"),
+		    Params::get("type")
+	    );
+
+	    echo $SERVER_RESPONSE;
+	    exit;
     }
 
     // HTTP Header Method: PUT
