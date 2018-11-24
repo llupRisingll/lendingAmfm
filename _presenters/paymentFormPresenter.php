@@ -1,7 +1,5 @@
 <?php
 class paymentFormPresenter {
-    // HTTP Header Method: GET
-    // Used to retrive a data or a view
     public function get(){
         View::addVar("view_title", "Payment Form");
 
@@ -40,14 +38,10 @@ class paymentFormPresenter {
 	    exit;
     }
 
-    // HTTP Header Method: PUT
-    // Usually used when about to update a data
     public function put(){
         Route::returnCode(401);
     }
 
-    // HTTP Header Method: DELETE
-    // Usually used when about to delete a data
     public function delete(){
         Route::returnCode(401);
     }

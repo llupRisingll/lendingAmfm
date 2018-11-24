@@ -45,10 +45,12 @@ class DataTableModel {
 			IF(COUNT(DISTINCT l.id) > 0, '<b class=\"text-success\">TRUE</b>', '<b class=\"text-danger\">FALSE</b>') as `active_loan`
 	    	# Pending Request and Account Info Connectivity		
 		FROM `accounts` a 
-			LEFT JOIN `account_info` ai 
-				ON a.id=ai.`accnt_id` 
+			INNER JOIN `account_info` ai 
+				ON a.id=ai.`accnt_id`
+			LEFT JOIN `loan_info` li
+				ON li.cid = ai.`accnt_id`
             LEFT JOIN `loan` l
-				ON l.cid=ai.`accnt_id`
+				ON l.id=li.lid
                 WHERE 1";
 
 		$dict = array();
@@ -218,9 +220,10 @@ class DataTableModel {
 			    (@monthly_due * @durationUS) - @loan_paid as past_due,
 			    
 			    # Normal Fetch
-			    cid, loan_balance, loan_amount, gross_loan, paid, id
+			   loan_balance, loan_amount, gross_loan, paid, id
 			FROM loan) l
-		INNER JOIN account_info ai ON ai.accnt_id = l.cid
+        INNER JOIN `loan_info` AS li ON l.id=li.lid
+		INNER JOIN `account_info` ai ON ai.accnt_id = li.cid
 		WHERE 1";
 
 

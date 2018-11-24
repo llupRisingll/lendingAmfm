@@ -107,19 +107,28 @@ class TransactionsModel {
 				// Save the loan
 				$prepared = $database->mysqli_prepare($connection, "
               		INSERT INTO `loan`
-              		(`cid`, `loan_type`, `loan_amount`, `monthly_due`, `gross_loan`, `loan_balance`, `loan_paid`, `lend_date`, `maturity_date`, `paid`) 
+              		(`loan_type`, `loan_amount`, `monthly_due`, `gross_loan`, `loan_balance`, `loan_paid`, `lend_date`, `maturity_date`, `paid`) 
               			VALUES 
-              		(:USER_ID, :PCKG_TYPE, :LOAN_AMOUNT, :MONTHLY_DUE,:GROSS_LOAN, :LOAN_BALANCE, 0, NOW(), NOW() + INTERVAL $loanDuration MONTH, 'np')
+              		(:PCKG_TYPE, :LOAN_AMOUNT, :MONTHLY_DUE,:GROSS_LOAN, :LOAN_BALANCE, 0, NOW(), NOW() + INTERVAL $loanDuration MONTH, 0)
                 ");
 
-
 				$database->mysqli_execute($prepared, array(
-					":USER_ID" => $userId,
 					":PCKG_TYPE" => $packType,
 					":LOAN_AMOUNT" => $loanAmount,
 					":MONTHLY_DUE" => ceil(self::grossLoan($loanAmount, $loanDuration)/$loanDuration),
 					":GROSS_LOAN" => self::grossLoan($loanAmount, $loanDuration),
 					":LOAN_BALANCE" => self::grossLoan($loanAmount, $loanDuration),
+				));
+
+				// Save the loan information
+				$prepared = $database->mysqli_prepare($connection, "
+              		INSERT INTO `loan_info`(`lid`, `cid`) VALUES (:LOAN_ID,:USER_ID)
+                ");
+
+
+				$database->mysqli_execute($prepared, array(
+					":USER_ID" => $userId,
+					":LOAN_ID" => $database->mysqli_insert_id($connection)
 				));
 
 			}
