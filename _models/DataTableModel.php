@@ -217,7 +217,7 @@ class DataTableModel {
 			    @durationUS := IF(@duration < 0, 0, @duration),
 				@monthly_due := monthly_due AS monthly_due,
 			    @loan_paid := loan_paid as loan_paid,
-			    (@monthly_due * @durationUS) - @loan_paid as past_due,
+			    IF(@durationUS <= 0, 0, (@monthly_due * @durationUS) - @loan_paid) as past_due,
 			    
 			    # Normal Fetch
 			   loan_balance, loan_amount, gross_loan, paid, id

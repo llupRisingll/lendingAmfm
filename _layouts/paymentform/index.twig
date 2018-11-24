@@ -63,6 +63,36 @@
     </table>
 </div>
 
+<!--Modal Approve-->
+<div class="modal fade" id="payModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-primary">
+				<span class="text-white">Payment</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form action="/payment" method="POST" class="modal-body">
+				<div>
+					<b>Name: </b>
+					<span id="name">Luis Edward Miranda</span>
+				</div>
+				<div>
+					<b> Total Due:</b>
+					<span> PHP </span>
+					<span id="loan_due" class="font-italic">50000</span>
+				</div>
+				<div class="form-group mt-2 mb-2">
+					<input type="hidden" name="lid" id="lid">
+					<input type="number" name="amount" class="form-control" placeholder="Enter Amount" required>
+				</div>
+				<button type="submit" class="btn btn-primary approve float-right">Confirm Payment</button>
+			</form>
+		</div>
+	</div>
+</div>
+
 <script type="text/javascript">
 	function tableRow(title, content){
 		return $("<tr/>").append([
@@ -115,7 +145,7 @@
 				    "targets": -1,
 				    "data": null,
 				    "defaultContent":
-				    "<button class='mr-1 approve btn btn-outline-primary' data-toggle='modal' data-target='#approve'>Pay</button>"
+				    "<button class='mr-1 pay btn btn-outline-primary' data-toggle='modal' data-target='#payModal'>Pay</button>"
 			    }
 		    ],
 		    "order": [[ 1, "desc" ]],
@@ -153,7 +183,7 @@
 				    "orderable":false,
 				    "data": null,
 				    "defaultContent":
-					    "<button class='mr-1 approve btn btn-outline-primary' data-toggle='modal' data-target='#approve'>Pay</button>"
+					    "<button class='mr-1 pay btn btn-outline-primary' data-toggle='modal' data-target='#payModal'>Pay</button>"
 			    }
 		    ],
 		    "order": [[ 1, "desc" ]],
@@ -191,7 +221,7 @@
 				    "orderable":false,
 				    "data": null,
 				    "defaultContent":
-					    "<button class='mr-1 approve btn btn-outline-primary' data-toggle='modal' data-target='#approve'>Pay</button>"
+					    "<button class='mr-1 pay btn btn-outline-primary' data-toggle='modal' data-target='#payModal'>Pay</button>"
 			    }
 		    ],
 		    "order": [[ 1, "desc" ]],
@@ -231,5 +261,30 @@
 			    tr.addClass('shown');
 		    }
 	    } );
+
+	    var data;
+	    // Dynamic IDS
+	    $(document).on("click", ".pay", function () {
+		    var tr = $(this).closest('tr');
+		    var targetTable = $(this).parents("table")[0]["id"];
+
+
+		    switch(targetTable){
+			    case "activeAccount":
+				    data = table1.row( tr ).data();
+				    break;
+			    case "withArrears":
+				    data = table2.row( tr ).data();
+				    break;
+			    case "maturedAccounts":
+				    data = table3.row( tr ).data();
+				    break;
+		    }
+
+			// Change the Data within the modal
+		    $("#name").text(data.fn + " "+ data.ln)
+		    $("#loan_due").text(data.total_due);
+		    $("#lid").val(data.loan_id);
+	    });
     });
 </script>

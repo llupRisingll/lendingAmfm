@@ -21,8 +21,15 @@ class paymentFormPresenter {
 
     public function post(){// Parameters to be accepted
 	    Params::permit(
-		    "search", "order", "start", "length", "draw", "type"
+		    "search", "order", "start", "length", "draw", "type",
+		    "amount", "lid"
 	    );
+
+	    if (Params::get("lid") != false && Params::get("amount") != false){
+	    	PaymentModel::clientPay(Params::get("lid"), Params::get("amount"));
+			header("location: payment");
+	    	exit;
+	    }
 
 	    // When getting the Transactions
 	    $SERVER_RESPONSE = DataTableModel::fetchAllLoans(
