@@ -92,7 +92,6 @@ class TransactionsModel {
 					":WALLET_ID" => $database->mysqli_insert_id($connection),
 					":CLIENT_ID" => $userId
 				));
-
 			}
 			// Approval of Uni level
 			else{
@@ -146,6 +145,19 @@ class TransactionsModel {
 					":LOAN_ID" => $database->mysqli_insert_id($connection)
 				));
 
+				// Create eWallet
+				$prepared = $database->mysqli_prepare($connection,
+					"INSERT INTO `uni_wallet`(`amount`, `balance`, `paid`) VALUES (0,0,0)"
+				);
+				$database->mysqli_execute($prepared, array());
+
+				$prepared = $database->mysqli_prepare($connection,
+					"INSERT INTO `uni_info`(`uwid`, `cid`) VALUES (:WALLET_ID,:CLIENT_ID)"
+				);
+				$database->mysqli_execute($prepared, array(
+					":WALLET_ID" => $database->mysqli_insert_id($connection),
+					":CLIENT_ID" => $userId
+				));
 			}
 
 			// Commit the changes when no error found.
