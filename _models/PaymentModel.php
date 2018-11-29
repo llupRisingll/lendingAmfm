@@ -39,7 +39,7 @@ class PaymentModel {
 			return true;
 		} catch(Exception $e){
 			/**
-			 * An exception has occured, which means that one of our database queries
+			 * An exception has occur, which means that one of our database queries
 			 * failed. Print out the error message.
 			 */
 			echo $e->getMessage();
