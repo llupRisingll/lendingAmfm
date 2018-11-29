@@ -1,0 +1,51 @@
+
+{# Include the DashBoard #}
+{% set page = "payment_history" %}
+{{ include("dashboard/header.twig") }}
+
+
+
+<div class="container mt-3">
+	<table id="activeAccount" class="table table-striped table-bordered" cellspacing="0">
+		<thead>
+		<tr>
+			<th>LID</th>
+			<th>First Name</th>
+			<th>Last Name</th>
+			<th>Date</th>
+			<th>Amount</th>
+		</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		var table1 = $('#activeAccount').DataTable({
+			"processing": true, "serverSide": true, "responsive": true,
+			"ajax": {
+				url :"/payment_history", type: "POST", data: { "type": "active" }
+			},
+			"columns": [
+				{
+					"data": "loan_id"
+				},{
+					"data": "fn"
+				}, {
+					"data": "ln"
+				},{
+					"data": "date_paid"
+				}, {
+					"data": "amount"
+				}
+			],
+			"order": [[ 1, "desc" ]],
+			language: {
+				paginate: {
+					previous: "&#171;", next: "&#187;"
+				}
+			}
+		});
+	});
+</script>

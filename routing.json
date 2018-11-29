@@ -4,5 +4,6 @@
     "/payment": "paymentFormPresenter.php",
     "/login": "loginPresenter.php",
     "/signout": "LogoutPresenter.php",
+    "/payment_history": "PaymentHistoryPresenter.php",
     "/withdrawals": "WithdrawalsPresenter.php"
 }
