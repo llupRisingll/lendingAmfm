@@ -62,7 +62,7 @@ class TransactionsModel {
 
 			// Approval of Binary Level
 			if ($transType == "binary"){
-				// Activate the binary account
+				// Activate the binary account by converting to 1
 				$prepared = $database->mysqli_prepare($connection,
 					"UPDATE `accounts` SET `bin_active`='1' WHERE `id`=:USER_ID;"
 				);
@@ -78,6 +78,21 @@ class TransactionsModel {
 					":USER_ID" => $userId,
 					":PARENT_ID" => $parentID
 				));
+
+				// Create eWallet
+				$prepared = $database->mysqli_prepare($connection,
+					"INSERT INTO `bin_wallet`(`amount`, `balance`, `paid`) VALUES (0,0,0)"
+				);
+				$database->mysqli_execute($prepared, array());
+
+				$prepared = $database->mysqli_prepare($connection,
+					"INSERT INTO `bin_info`(`bwid`, `cid`) VALUES (:WALLET_ID,:CLIENT_ID)"
+				);
+				$database->mysqli_execute($prepared, array(
+					":WALLET_ID" => $database->mysqli_insert_id($connection),
+					":CLIENT_ID" => $userId
+				));
+
 			}
 			// Approval of Uni level
 			else{
