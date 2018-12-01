@@ -1,9 +1,44 @@
-INSERT INTO `accounts` (`id`, `username`, `pass`, `acct_type`, `bin_active`, `uni_active`, `hash_id`, `uniparent`) VALUES 
-(NULL, 'test2', 'test2', 'client', '0', '0', 'test2', '1'),
-(NULL, 'test3', 'test3', 'client', '0', '0', 'test3', '1'),
-(NULL, 'test4', 'test4', 'client', '0', '0', 'test4', '1'),
-(NULL, 'test5', 'test5', 'client', '0', '0', 'test5', '1'),
-(NULL, 'test6', 'test6', 'client', '0', '0', 'test6', '1'),
-(NULL, 'test7', 'test7', 'client', '0', '0', 'test7', '1'),
-(NULL, 'test8', 'test8', 'client', '0', '0', 'test8', '1'),
-(NULL, 'test9', 'test9', 'client', '0', '0', 'test9', '1'),
+
+
+INSERT INTO `unipath`(`anc`, `desc`, `parent`)
+(SELECT `anc`, 1 AS `desc`, 1 AS `parent` FROM `binpath` WHERE `desc`=1)
+    UNION
+(SELECT 1 AS `enc`, 1 AS `desc`, 1 AS `parent`)
+    ON DUPLICATE KEY UPDATE `parent`= 1;
+
+
+INSERT INTO `unipath`(`anc`, `desc`, `parent`)
+(SELECT `anc`, 2 AS `desc`, 1 AS `parent` FROM `binpath` WHERE `desc`=1) 
+    UNION
+(SELECT 2 AS `enc`, 2 AS `desc`, 1 AS `parent`) 
+    ON DUPLICATE KEY UPDATE `parent`= 1;
+    
+INSERT INTO `unipath`(`anc`, `desc`, `parent`)
+(SELECT `anc`, 3 AS `desc`, 1 AS `parent` FROM `binpath` WHERE `desc`=1) 
+    UNION
+(SELECT 3 AS `enc`, 3 AS `desc`, 1 AS `parent`) 
+    ON DUPLICATE KEY UPDATE `parent`= 1;
+    
+INSERT INTO `unipath`(`anc`, `desc`, `parent`)
+(SELECT `anc`, 4 AS `desc`, 1 AS `parent` FROM `binpath` WHERE `desc`=1) 
+    UNION
+(SELECT 4 AS `enc`, 4 AS `desc`, 1 AS `parent`) 
+    ON DUPLICATE KEY UPDATE `parent`= 1;
+    
+INSERT INTO `unipath`(`anc`, `desc`, `parent`)
+(SELECT `anc`, 5 AS `desc`, 1 AS `parent` FROM `binpath` WHERE `desc`=1) 
+    UNION
+(SELECT 5 AS `enc`, 5 AS `desc`, 1 AS `parent`) 
+    ON DUPLICATE KEY UPDATE `parent`= 1;
+    
+INSERT INTO `unipath`(`anc`, `desc`, `parent`)
+(SELECT `anc`, 6 AS `desc`, 1 AS `parent` FROM `binpath` WHERE `desc`=1) 
+    UNION
+(SELECT 6 AS `enc`, 6 AS `desc`, 1 AS `parent`) 
+    ON DUPLICATE KEY UPDATE `parent`= 1;
+    
+INSERT INTO `unipath`(`anc`, `desc`, `parent`)
+(SELECT `anc`, 7 AS `desc`, 1 AS `parent` FROM `binpath` WHERE `desc`=1) 
+    UNION
+(SELECT 7 AS `enc`, 7 AS `desc`, 1 AS `parent`) 
+    ON DUPLICATE KEY UPDATE `parent`= 1;

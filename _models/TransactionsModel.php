@@ -1,6 +1,13 @@
 <?php
 
 class TransactionsModel {
+	public static function earn(){
+		$total_earnings = UniLevelEarning::compute_total_earnings(1);
+
+		UniLevelEarning::save_information($total_earnings);
+
+	}
+
 	public static function declineTransaction(String $tid){
 		// DELETE FROM DATABASE algorithm
 		// Database connection
@@ -45,13 +52,7 @@ class TransactionsModel {
 
 		$database->mysqli_begin_transaction($connection);
 
-		/**
-		 * We will need to wrap our queries inside a TRY / CATCH block.
-		 * That way, we can rollback the transaction if a query fails and a PDO exception occurs.
-		 * Our catch block will handle any exceptions that are thrown.
-		 */
 		try {
-
 			// Remove from the pending
 			$prepared = $database->mysqli_prepare($connection,
 				"DELETE FROM `pending_requests` WHERE `id`=:TRANSACTION_ID;"
@@ -103,7 +104,7 @@ class TransactionsModel {
 					":USER_ID" => $userId
 				));
 
-				// Add to the uni path
+				// Add to the uni path / Plot the Data
 				$prepared = $database->mysqli_prepare($connection, "
               	INSERT INTO `unipath`(`anc`, `desc`, `parent`)
 					(SELECT `anc`, :USER_ID AS `desc`, :PARENT_ID AS `parent` FROM `binpath` WHERE `desc`=:PARENT_ID) 
@@ -138,7 +139,6 @@ class TransactionsModel {
 				$prepared = $database->mysqli_prepare($connection, "
               		INSERT INTO `loan_info`(`lid`, `cid`) VALUES (:LOAN_ID,:USER_ID)
                 ");
-
 
 				$database->mysqli_execute($prepared, array(
 					":USER_ID" => $userId,
