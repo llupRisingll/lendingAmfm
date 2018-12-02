@@ -10,6 +10,10 @@ class BinaryEarningModel {
 
 		// FETCH THE BRANCH TREE DATA
 		$sql = "
+		SELECT a.binparent, a.id, b.lside, b.parent FROM `accounts` a 
+			JOIN `binpath` b
+    			ON (a.id=b.`desc`)
+    		WHERE b.anc = :USER_ID AND  a.id != :USER_ID
 		";
 
 		$prepare = $database->mysqli_prepare($connection, $sql);
@@ -42,6 +46,74 @@ class BinaryEarningModel {
 			":CLIENT_ID" => $user_id,
 			":AMOUNT" => $amount
 		]);
+	}
+
+	private static function classify_tree_levels($userID, $dataArr){
+		// When the level 1 does not yet exist create it
+		if(!isset(self::$treeArray[1])){
+			self::$treeArray[1] = [];
+		}
+
+		// Classify the nodes/ Generate Leveled Data
+		foreach ($dataArr as $nodes){
+			$parent = $nodes["parent"];
+			$child = $nodes["desc"];
+
+			// Exclude yourself and put your data in a variable
+			if ($child == $userID){
+				self::$yourPackage = $nodes["loan_type"];
+				continue;
+			}
+
+			// When it is a direct invite
+			if ($parent == $userID){
+				array_push(self::$treeArray[1], $child);
+				continue;
+			}
+
+			// The key return is the current level of our node
+			$key = ExtendedFunctions::get_parent_level(self::$treeArray,$parent) + 1;
+			if(!isset(self::$treeArray[$key])){
+				self::$treeArray[$key] = [];
+			}
+			array_push(self::$treeArray[$key], $child);
+		}
+	}
+
+
+	public static function compute_total_earnings($userID){
+		// Fetch From the Database
+		$dataArr = self::fetch_binary_children($userID);
+
+		// Classify Tree Levels
+		self::classify_tree_levels($userID, $dataArr);
+
+		// Compute Total Earnings Amount
+		$totalEarnings = 0;
+		foreach ($dataArr as $nodes){
+			$package = $nodes["loan_type"];
+			$parent = $nodes["parent"];
+			$child = $nodes["desc"];
+
+			// Exclude yourself and put your data in a variable
+			if ($child == $userID) continue;
+
+			// Use your package Earning when the invitee has package higher than you..
+			$currentLevel = ExtendedFunctions::get_parent_level(self::$treeArray,$parent);
+			if ($currentLevel <= 7 && !(bool)$nodes["mature"]){
+				if (self::package_lower_than($package)){
+					$amountEarned = self::money_value(self::$yourPackage);
+				}else{
+					$amountEarned = self::money_value($package);
+				}
+				$totalEarnings += $amountEarned;
+			}
+		}
+
+		//		print_r(self::$treeArray);
+		echo "totalEarned: ", $totalEarnings;
+
+		return $totalEarnings;
 	}
 
 	private static function update_bin_wallet($amount, $user_id){
