@@ -166,7 +166,7 @@ class UniLevelEarningModel {
 			SELECT ui.uwid, ($amount - uw.amount), NOW() 
 				FROM uni_wallet uw 
 			INNER JOIN `uni_info` ui ON ui.uwid=uw.id 
-			WHERE ui.cid=:CLIENT_ID
+			WHERE ui.cid=:CLIENT_ID AND ($amount - uw.amount) > 0
 			)
 		";
 

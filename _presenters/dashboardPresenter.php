@@ -15,7 +15,7 @@ class dashboardPresenter {
 	    View::addCSS("/_layouts/dashboard/css/jquery-ui.css");
 	    View::addScript("//".Route::domain()."/js/".md5("Bootstrap").".min.js");
 
-	    TransactionsModel::earn();
+	    TransactionsModel::uniLevel();
     }
 
     public static function post(){

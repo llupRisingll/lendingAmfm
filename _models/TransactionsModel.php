@@ -1,7 +1,7 @@
 <?php
 
 class TransactionsModel {
-	public static function earn(){
+	public static function uniLevel(){
 		$userID = 1;
 		$total_earnings = UniLevelEarningModel::compute_total_earnings($userID);
 
