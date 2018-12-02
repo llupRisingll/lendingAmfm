@@ -173,7 +173,7 @@ class UniLevelEarning {
 		INSERT INTO `uni_history`
 			(`uwid`, `amount`, `earn_date`)
 			(
-			SELECT ui.uwid, :AMOUNT - uw.amount, NOW() 
+			SELECT ui.uwid, ($amount - uw.amount), NOW() 
 				FROM uni_wallet uw 
 			INNER JOIN `uni_info` ui ON ui.uwid=uw.id 
 			WHERE ui.cid=:CLIENT_ID
@@ -182,8 +182,7 @@ class UniLevelEarning {
 
 		$prepare = $database->mysqli_prepare($connection, $sql);
 		$database->mysqli_execute($prepare, [
-			":CLIENT_ID" => $user_id,
-			":AMOUNT" => $amount
+			":CLIENT_ID" => $user_id
 		]);
 	}
 
@@ -195,9 +194,8 @@ class UniLevelEarning {
 
 		try {
 			self::upsert_uni_monthly($amount, $user_id);
-			self::update_uni_wallet($amount, $user_id);
-			// TODO: Add to Uni History
 			self::add_uni_history($amount, $user_id);
+			self::update_uni_wallet($amount, $user_id);
 
 			// Commit the changes when no error found.
 			$database->mysqli_commit($connection);
