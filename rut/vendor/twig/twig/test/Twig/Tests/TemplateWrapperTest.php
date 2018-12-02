@@ -17,7 +17,7 @@ class Twig_Tests_TemplateWrapperTest extends \PHPUnit\Framework\TestCase
             'index_with_use' => '{% use "imported" %}{% block foo %}{% endblock %}',
             'index_with_extends' => '{% extends "extended" %}{% block foo %}{% endblock %}',
             'imported' => '{% block imported %}{% endblock %}',
-            'extended' => '{% block extended %}{% endblock %}',
+            'ExtendedFunctions' => '{% block extended %}{% endblock %}',
         )));
 
         $wrapper = new Twig_TemplateWrapper($twig, $twig->loadTemplate('index'));
@@ -32,8 +32,8 @@ class Twig_Tests_TemplateWrapperTest extends \PHPUnit\Framework\TestCase
 
         $wrapper = new Twig_TemplateWrapper($twig, $twig->loadTemplate('index_with_extends'));
         $this->assertTrue($wrapper->hasBlock('foo'));
-        $this->assertTrue($wrapper->hasBlock('extended'));
-        $this->assertEquals(array('foo', 'extended'), $wrapper->getBlockNames());
+        $this->assertTrue($wrapper->hasBlock('ExtendedFunctions'));
+        $this->assertEquals(array('foo', 'ExtendedFunctions'), $wrapper->getBlockNames());
     }
 
     public function testRenderBlock()
