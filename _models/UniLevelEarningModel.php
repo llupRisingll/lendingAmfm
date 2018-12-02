@@ -76,7 +76,7 @@ class UniLevelEarningModel {
 			}
 
 			// The key return is the current level of our node
-			$key = ExtendedFunctions::get_parent_level($parent) + 1;
+			$key = ExtendedFunctions::get_parent_level(self::$treeArray,$parent) + 1;
 			if(!isset(self::$treeArray[$key])){
 				self::$treeArray[$key] = [];
 			}
@@ -102,7 +102,7 @@ class UniLevelEarningModel {
 			if ($child == $userID) continue;
 
 			// Use your package Earning when the invitee has package higher than you..
-			$currentLevel = ExtendedFunctions::get_parent_level($parent);
+			$currentLevel = ExtendedFunctions::get_parent_level(self::$treeArray,$parent);
 			if ($currentLevel <= 7 && !(bool)$nodes["mature"]){
 				if (self::package_lower_than($package)){
 					$amountEarned = self::money_value(self::$yourPackage);
