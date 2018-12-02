@@ -80,6 +80,24 @@ class BinaryEarningModel {
 		}
 	}
 
+	private static function update_bin_wallet($amount, $user_id){
+		$database = DatabaseModel::initConnections();
+		$connection = DatabaseModel::getMainConnection();
+
+		// FETCH THE BRANCH TREE DATA
+		$sql = "
+		UPDATE `uni_wallet` as uw 
+		INNER JOIN `uni_info` as ui ON ui.uwid=uw.id 
+		SET uw.`amount`=:AMOUNT WHERE ui.cid=:CLIENT_ID
+		";
+
+		$prepare = $database->mysqli_prepare($connection, $sql);
+		$database->mysqli_execute($prepare, [
+			":CLIENT_ID" => $user_id,
+			":AMOUNT" => $amount
+		]);
+	}
+
 
 	public static function compute_total_earnings($userID){
 		// Fetch From the Database
@@ -116,24 +134,6 @@ class BinaryEarningModel {
 		return $totalEarnings;
 	}
 
-	private static function update_bin_wallet($amount, $user_id){
-		$database = DatabaseModel::initConnections();
-		$connection = DatabaseModel::getMainConnection();
-
-		// FETCH THE BRANCH TREE DATA
-		$sql = "
-		UPDATE `uni_wallet` as uw 
-		INNER JOIN `uni_info` as ui ON ui.uwid=uw.id 
-		SET uw.`amount`=:AMOUNT WHERE ui.cid=:CLIENT_ID
-		";
-
-		$prepare = $database->mysqli_prepare($connection, $sql);
-		$database->mysqli_execute($prepare, [
-			":CLIENT_ID" => $user_id,
-			":AMOUNT" => $amount
-		]);
-	}
-
 	public static function save_information($amount, $user_id){
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
@@ -142,7 +142,9 @@ class BinaryEarningModel {
 
 		try {
 			// TODO: add to bin history
+			self::add_bin_history($amount, $user_id);
 			// TODO: update bin wallet
+			self::update_bin_wallet($amount, $user_id);
 
 			// Commit the changes when no error found.
 			$database->mysqli_commit($connection);

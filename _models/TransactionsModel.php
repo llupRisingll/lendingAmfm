@@ -9,6 +9,11 @@ class TransactionsModel {
 
 	}
 
+	public static function binary(){
+		$userID = 1;
+		$total_earnings = BinaryEarningModel::compute_total_earnings($userID);
+	}
+
 	public static function declineTransaction(String $tid){
 		// DELETE FROM DATABASE algorithm
 		// Database connection
