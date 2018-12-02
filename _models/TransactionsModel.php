@@ -2,9 +2,10 @@
 
 class TransactionsModel {
 	public static function earn(){
-		$total_earnings = UniLevelEarning::compute_total_earnings(1);
+		$userID = 1;
+		$total_earnings = UniLevelEarning::compute_total_earnings($userID);
 
-		UniLevelEarning::save_information($total_earnings);
+		UniLevelEarning::save_information($total_earnings, $userID);
 
 	}
 

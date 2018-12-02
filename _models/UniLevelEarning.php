@@ -129,43 +129,75 @@ class UniLevelEarning {
 		return $totalEarnings;
 	}
 
-	private static function upsert_uni_monthly($amount){
+	private static function upsert_uni_monthly($amount, $user_id){
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
 
 		// FETCH THE BRANCH TREE DATA
-		$sql = "";
+		$sql = "
+		INSERT INTO `uni_monthly`(`cid`, `amount`) VALUES (:CLIENT_ID,:AMOUNT)
+		ON DUPLICATE KEY UPDATE `amount`=:AMOUNT	
+		";
 
 		$prepare = $database->mysqli_prepare($connection, $sql);
 		$database->mysqli_execute($prepare, [
-
+			":CLIENT_ID" => $user_id,
+			":AMOUNT" => $amount
 		]);
-
 	}
 
-	private static function update_uni_wallet($amount){
+	private static function update_uni_wallet($amount, $user_id){
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
+
+		// FETCH THE BRANCH TREE DATA
+		$sql = "
+		UPDATE `uni_wallet` as uw 
+		INNER JOIN `uni_info` as ui ON ui.uwid=uw.id 
+		SET uw.`amount`=:AMOUNT WHERE ui.cid=:CLIENT_ID
+		";
+
+		$prepare = $database->mysqli_prepare($connection, $sql);
+		$database->mysqli_execute($prepare, [
+			":CLIENT_ID" => $user_id,
+			":AMOUNT" => $amount
+		]);
 	}
 
-	private static function add_uni_history($amount){
+	private static function add_uni_history($amount, $user_id){
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
+
+		// FETCH THE BRANCH TREE DATA
+		$sql = "
+		INSERT INTO `uni_history`
+			(`uwid`, `amount`, `earn_date`)
+			(
+			SELECT ui.uwid, :AMOUNT - uw.amount, NOW() 
+				FROM uni_wallet uw 
+			INNER JOIN `uni_info` ui ON ui.uwid=uw.id 
+			WHERE ui.cid=:CLIENT_ID
+			)
+		";
+
+		$prepare = $database->mysqli_prepare($connection, $sql);
+		$database->mysqli_execute($prepare, [
+			":CLIENT_ID" => $user_id,
+			":AMOUNT" => $amount
+		]);
 	}
 
-	public static function save_information($amount){
+	public static function save_information($amount, $user_id){
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
 
 		$database->mysqli_begin_transaction($connection);
 
 		try {
-			// TODO: Upsert uni_monthly
-			self::upsert_uni_monthly($amount);
-			// TODO: Update Uni_wallet
-			self::update_uni_wallet($amount);
+			self::upsert_uni_monthly($amount, $user_id);
+			self::update_uni_wallet($amount, $user_id);
 			// TODO: Add to Uni History
-			self::add_uni_history($amount);
+			self::add_uni_history($amount, $user_id);
 
 			// Commit the changes when no error found.
 			$database->mysqli_commit($connection);
