@@ -104,7 +104,7 @@ class UniLevelEarningModel {
 			// Use your package Earning when the invitee has package higher than you..
 			$currentLevel = ExtendedFunctions::get_parent_level(self::$treeArray,$parent);
 			if ($currentLevel <= 7 && !(bool)$nodes["mature"]){
-				if (self::package_lower_than($package)){    
+				if (self::package_lower_than($package)){
 					$amountEarned = self::money_value(self::$yourPackage);
 				}else{
 					$amountEarned = self::money_value($package);

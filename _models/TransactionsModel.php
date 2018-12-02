@@ -66,10 +66,11 @@ class TransactionsModel {
 			if ($transType == "binary"){
 				// Activate the binary account by converting to 1
 				$prepared = $database->mysqli_prepare($connection,
-					"UPDATE `accounts` SET `bin_active`='1' WHERE `id`=:USER_ID;"
+					"UPDATE `accounts` SET `bin_active`='1', `binparent`=:PARENT_ID WHERE `id`=:USER_ID;"
 				);
 				$database->mysqli_execute($prepared, array(
-					":USER_ID" => $userId
+					":USER_ID" => $userId,
+					":PARENT_ID" => $parentID
 				));
 
 				// Add to the pending bin path
