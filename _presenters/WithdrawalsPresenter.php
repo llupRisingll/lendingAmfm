@@ -18,20 +18,32 @@ class WithdrawalsPresenter {
 
     public function post(){
 	    Params::permit(
-		    "search", "order", "start", "length", "draw"
+		    "search", "order", "start", "length", "draw",
+		    "cid", "type"
 	    );
 
-	    // When getting the Transactions
-	    $SERVER_RESPONSE = DataTableModel::fetchWithdrawals(
-		    Params::get("start"),
-		    Params::get("length"),
-		    Params::get("order"),
-		    Params::get("draw"),
-		    Params::get("search")
-	    );
+	    if (Params::get("search") != false && Params::get("order") != false &&
+		    Params::get("length") != false && Params::get("draw") != false) {
 
-	    echo $SERVER_RESPONSE;
-	    exit;
+		    // When getting the Transactions
+		    $SERVER_RESPONSE = DataTableModel::fetchWithdrawals(
+		    	Params::get("start"),
+			    Params::get("length"),
+			    Params::get("order"),
+			    Params::get("draw"),
+			    Params::get("search")
+		    );
+
+		    echo $SERVER_RESPONSE;
+		    exit;
+	    }
+
+		if (Params::get("cid") != false && Params::get("type") != false){
+	    	WithdrawalsModels::respond_to_transaction(Params::get("cid"), Params::get("type"));
+			header("location: /withdrawals");
+			exit;
+		}
+
     }
 
     public function put(){
