@@ -97,7 +97,9 @@ class BinaryEarningModel {
 		$sql = "
 		UPDATE `bin_wallet` as bw 
 		INNER JOIN `bin_info` as bi ON bi.bwid=bw.id 
-		SET bw.`amount`=:AMOUNT WHERE bi.cid=:CLIENT_ID
+			SET bw.`amount`=:AMOUNT, 
+				bw.`balance` = (:AMOUNT-bw.`paid`)
+		WHERE bi.cid=:CLIENT_ID
 		";
 
 		$prepare = $database->mysqli_prepare($connection, $sql);

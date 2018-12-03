@@ -144,7 +144,9 @@ class UniLevelEarningModel {
 		$sql = "
 		UPDATE `uni_wallet` as uw 
 		INNER JOIN `uni_info` as ui ON ui.uwid=uw.id 
-		SET uw.`amount`=:AMOUNT WHERE ui.cid=:CLIENT_ID
+			SET uw.`amount`=:AMOUNT,
+				uw.`balance` = (:AMOUNT-uw.`paid`) 
+		WHERE ui.cid=:CLIENT_ID
 		";
 
 		$prepare = $database->mysqli_prepare($connection, $sql);
