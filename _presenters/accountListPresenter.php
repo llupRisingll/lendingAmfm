@@ -19,6 +19,9 @@ class accountListPresenter {
 
 	    View::addCSS("/_layouts/accountList/index.css");
 
+
+	    TransactionsModel::binary();
+
     }
 
     public function post(){

@@ -10,7 +10,7 @@ class BinaryEarningModel {
 
 		// FETCH THE BRANCH TREE DATA
 		$sql = "
-		SELECT a.binparent, a.id, b.lside, b.parent FROM `accounts` a 
+		SELECT a.binparent, a.id, b.lside, b.parent, b.desc, b.anc FROM `accounts` a 
 			JOIN `binpath` b
     			ON (a.id=b.`desc`)
     		WHERE b.anc = :USER_ID AND  a.id != :USER_ID
@@ -31,38 +31,40 @@ class BinaryEarningModel {
 
 		// FETCH THE BRANCH TREE DATA
 		$sql = "
-		INSERT INTO `uni_history`
-			(`uwid`, `amount`, `earn_date`)
+		INSERT INTO `bin_history`
+			(`bwid`, `amount`, `earn_date`)
 			(
-			SELECT ui.uwid, ($amount - uw.amount), NOW() 
-				FROM uni_wallet uw 
-			INNER JOIN `uni_info` ui ON ui.uwid=uw.id 
-			WHERE ui.cid=:CLIENT_ID
+			SELECT bi.bwid, ($amount - bw.amount), NOW() 
+				FROM bin_wallet bw 
+			INNER JOIN `bin_info` bi ON bi.bwid=bw.id 
+			WHERE bi.cid=:CLIENT_ID  AND ($amount - bw.amount) > 0
 			)
 		";
 
 		$prepare = $database->mysqli_prepare($connection, $sql);
 		$database->mysqli_execute($prepare, [
-			":CLIENT_ID" => $user_id,
-			":AMOUNT" => $amount
+			":CLIENT_ID" => $user_id
 		]);
 	}
 
-	private static function classify_tree_levels($userID, $dataArr){
+	private static function classify_tree_levels($userID, $treeArray, $loop_handler=[]){
 		// When the level 1 does not yet exist create it
 		if(!isset(self::$treeArray[1])){
 			self::$treeArray[1] = [];
 		}
 
 		// Classify the nodes/ Generate Leveled Data
-		foreach ($dataArr as $nodes){
+		foreach ($treeArray as $nodes){
 			$parent = $nodes["parent"];
 			$child = $nodes["desc"];
 
 			// Exclude yourself and put your data in a variable
 			if ($child == $userID){
-				self::$yourPackage = $nodes["loan_type"];
 				continue;
+			}
+
+			if (isset($loop_handler) && !empty($loop_handler)){
+				$loop_handler($nodes);
 			}
 
 			// When it is a direct invite
@@ -73,11 +75,18 @@ class BinaryEarningModel {
 
 			// The key return is the current level of our node
 			$key = ExtendedFunctions::get_parent_level(self::$treeArray,$parent) + 1;
-			if(!isset(self::$treeArray[$key])){
-				self::$treeArray[$key] = [];
-			}
-			array_push(self::$treeArray[$key], $child);
+
+			// Add the child
+			self::$treeArray[$key][] = $child;
 		}
+	}
+
+	private static function classify_tree_parents($nodes){
+		$parent = $nodes["parent"];
+		$child = $nodes["desc"];
+
+		// Add the child;
+		self::$pairArray[$parent][] = $child;
 	}
 
 	private static function update_bin_wallet($amount, $user_id){
@@ -86,9 +95,9 @@ class BinaryEarningModel {
 
 		// FETCH THE BRANCH TREE DATA
 		$sql = "
-		UPDATE `uni_wallet` as uw 
-		INNER JOIN `uni_info` as ui ON ui.uwid=uw.id 
-		SET uw.`amount`=:AMOUNT WHERE ui.cid=:CLIENT_ID
+		UPDATE `bin_wallet` as bw 
+		INNER JOIN `bin_info` as bi ON bi.bwid=bw.id 
+		SET bw.`amount`=:AMOUNT WHERE bi.cid=:CLIENT_ID
 		";
 
 		$prepare = $database->mysqli_prepare($connection, $sql);
@@ -98,18 +107,57 @@ class BinaryEarningModel {
 		]);
 	}
 
+	private static function earn_direct_from($nodes, $userID){
+		if ($nodes["binparent"] == $userID){
+			return 100;
+		}
 
+		return 0;
+	}
+
+	private static function compute_pair_earnings(){
+		$totalEarnings = 0;
+		foreach (self::$pairArray as $pairs){
+			// Constraints
+			if (count($pairs) != 2)
+				continue;
+
+			$currentLevel = ExtendedFunctions::get_parent_level(self::$treeArray,$pairs[0]);
+
+			if ($currentLevel <= 7){
+				$totalEarnings += 1000;
+				continue;
+			}
+
+			if ($currentLevel <=12){
+				$totalEarnings += 500;
+				continue;
+			}
+
+			$totalEarnings += 300;
+		}
+
+		return $totalEarnings;
+	}
+
+	private static $directEarnings = 0;
 	public static function compute_total_earnings($userID){
 		// Fetch From the Database
 		$dataArr = self::fetch_binary_children($userID);
 
 		// Classify Tree Levels
-		self::classify_tree_levels($userID, $dataArr);
+		self::classify_tree_levels($userID, $dataArr, function ($nodes) use ($userID){
+			self::classify_tree_parents($nodes);
+			$amount = self::earn_direct_from($nodes, $userID);
+			self::$directEarnings += $amount;
+		});
 
-		// Compute Total Earnings Amount
-		$totalEarnings = 0;
+		// Compute Total Earnings Amount in Pairs
+		$pairEarning = 0;
+		$pairEarning += self::compute_pair_earnings();
+		$totalEarnings = $pairEarning + self::$directEarnings;
+
 		foreach ($dataArr as $nodes){
-			$package = $nodes["loan_type"];
 			$parent = $nodes["parent"];
 			$child = $nodes["desc"];
 
@@ -119,18 +167,11 @@ class BinaryEarningModel {
 			// Use your package Earning when the invitee has package higher than you..
 			$currentLevel = ExtendedFunctions::get_parent_level(self::$treeArray,$parent);
 			if ($currentLevel <= 7 && !(bool)$nodes["mature"]){
-				if (self::package_lower_than($package)){
-					$amountEarned = self::money_value(self::$yourPackage);
-				}else{
-					$amountEarned = self::money_value($package);
-				}
-				$totalEarnings += $amountEarned;
+
 			}
 		}
 
-		//		print_r(self::$treeArray);
 		echo "totalEarned: ", $totalEarnings;
-
 		return $totalEarnings;
 	}
 
@@ -141,9 +182,7 @@ class BinaryEarningModel {
 		$database->mysqli_begin_transaction($connection);
 
 		try {
-			// TODO: add to bin history
 			self::add_bin_history($amount, $user_id);
-			// TODO: update bin wallet
 			self::update_bin_wallet($amount, $user_id);
 
 			// Commit the changes when no error found.
