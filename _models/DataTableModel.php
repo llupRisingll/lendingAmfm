@@ -176,6 +176,70 @@ class DataTableModel {
 		return self::generateJSON($draw, $totalData, $totalFiltered, $dataArr);
 	}
 
+	public static function fetchWithdrawals($start, $length, $order, $draw, $search=null){
+		// Database connection
+		$database = DatabaseModel::initConnections();
+		$connection = DatabaseModel::getMainConnection();
+
+		// DataTable Arrangement according to its index usage on the dataTable
+		$columns = array("cid", "fn", "ln", "amount", "resq_data");
+
+		/**
+		 * GET ALL OF THE DATA WITHOUT FILTERING
+		 */
+		// Select all of the data in the pending table
+		$sql = "SELECT `cid` FROM `withdrawal_request` WHERE 1";
+
+		// Process of querying data
+		$prepare = $database->mysqli_prepare($connection, $sql);
+		$database->mysqli_execute($prepare);
+
+		// Get the total amount of data without any filter or search
+		$totalData = $database->mysqli_num_rows($prepare);
+
+		/**
+		 * GET ALL OF THE DATA WITH SEARCH FILTER
+		 */
+		// Generate SQL according to parameters
+		$sql = "
+		SELECT ai.fn, ai.ln, wr.* FROM `withdrawal_request` wr
+		INNER JOIN account_info ai 
+			ON wr.cid = ai.accnt_id  
+		WHERE 1
+		";
+
+		$dict = array();
+
+		if (!empty($search["value"])){
+			$sql .= " AND ai.`fn` LIKE :SEARCH_STRING";
+			$dict[":SEARCH_STRING"] = "%".$search["value"]."%";
+		}
+
+		// Process of querying data
+		$prepare = $database->mysqli_prepare($connection, $sql);
+		$database->mysqli_execute($prepare, $dict);
+
+		// Get the total amount of data without any filter or search
+		$totalFiltered = $database->mysqli_num_rows($prepare);
+
+		/**
+		 * GET ALL OF THE DATA WITH SEARCH FILTER, ORDERING AND PAGE LIMITATION
+		 */
+		$direction = $order[0]["dir"];
+		$columnName = $columns[$order[0]["column"]];
+		$sql .= " ORDER BY `$columnName` $direction LIMIT $start, $length";
+
+		// Process of querying data
+		$prepare = $database->mysqli_prepare($connection, $sql);
+		$database->mysqli_execute($prepare, $dict);
+
+		// Prepare the dataArray algorithm by adding extra column
+		$dataArr = $database->mysqli_fetch_assoc($prepare);
+
+		// Return the generated JSOn
+		return self::generateJSON($draw, $totalData, $totalFiltered, $dataArr);
+	}
+
 
 	public static function fetchLoanHistory($start, $length, $order, $draw, $search=null){
 		// Database connection
@@ -183,7 +247,7 @@ class DataTableModel {
 		$connection = DatabaseModel::getMainConnection();
 
 		// DataTable Arrangement according to its index usage on the dataTable
-		$columns = array("", "fn", "ln");
+		$columns = array("loan_id", "fn", "ln");
 
 		/**
 		 * GET ALL OF THE DATA WITHOUT FILTERING

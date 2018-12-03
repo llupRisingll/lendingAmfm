@@ -17,7 +17,21 @@ class WithdrawalsPresenter {
     }
 
     public function post(){
-        Route::returnCode(401);
+	    Params::permit(
+		    "search", "order", "start", "length", "draw"
+	    );
+
+	    // When getting the Transactions
+	    $SERVER_RESPONSE = DataTableModel::fetchWithdrawals(
+		    Params::get("start"),
+		    Params::get("length"),
+		    Params::get("order"),
+		    Params::get("draw"),
+		    Params::get("search")
+	    );
+
+	    echo $SERVER_RESPONSE;
+	    exit;
     }
 
     public function put(){
