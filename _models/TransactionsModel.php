@@ -5,8 +5,11 @@ class TransactionsModel {
 		$userID = 1;
 		$total_earnings = UniLevelEarningModel::compute_total_earnings($userID);
 
-		UniLevelEarningModel::save_information($total_earnings, $userID);
+		try{
+			DB_UnilevelEarning::save_information($total_earnings);
+		}catch (Exception $e){
 
+		}
 	}
 
 	public static function binary(){
