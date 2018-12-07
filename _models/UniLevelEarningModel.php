@@ -96,7 +96,7 @@ class UniLevelEarningModel {
 	}
 
 	public static function compute_total_earnings($userID){
-		$parentList = DB_UnilevelEarning::fetch_unilevel_parents(63);
+		$parentList = DB_UnilevelEarning::fetch_unilevel_parents($userID);
 
 		$directEarning = [];
 		foreach ($parentList as $parent){

@@ -1,22 +1,6 @@
 <?php
 
 class TransactionsModel {
-	public static function uniLevel(){
-		$userID = 1;
-		$total_earnings = UniLevelEarningModel::compute_total_earnings($userID);
-
-		try{
-			DB_UnilevelEarning::save_information($total_earnings);
-		}catch (Exception $e){
-
-		}
-	}
-
-	public static function binary(){
-		$userID = 1;
-		$total_earnings = BinaryEarningModel::compute_total_earnings($userID);
-		BinaryEarningModel::save_information($total_earnings, $userID);
-	}
 
 	public static function declineTransaction(String $tid){
 		// DELETE FROM DATABASE algorithm
@@ -169,11 +153,14 @@ class TransactionsModel {
 					":WALLET_ID" => $database->mysqli_insert_id($connection),
 					":CLIENT_ID" => $userId
 				));
+
+				// Save the Earnings
+				$total_earnings = UniLevelEarningModel::compute_total_earnings($userId);
+				DB_UnilevelEarning::save_information($total_earnings);
 			}
 
 			// Commit the changes when no error found.
 			$database->mysqli_commit($connection);
-
 			return true;
 
 		} catch(Exception $e){
