@@ -86,16 +86,18 @@ class DB_UnilevelEarning {
 
 		$generatedQuery = self::generate_sql_values($arrayValues);
 
-		// FETCH THE BRANCH TREE DATA
+		// OLD UNI MONTHLY - NEW COMPUTED
 		$sql = "
 		INSERT INTO `uni_history`
 			(`uwid`, `amount`, `earn_date`)
 			(
-			SELECT ui.uwid, (gs.amount - uw.amount), NOW() 
+			SELECT ui.uwid, (gs.amount - IFNULL(um.amount, 0)), NOW() 
 				FROM uni_wallet uw 
 			INNER JOIN `uni_info` ui ON ui.uwid=uw.id 
 			INNER JOIN ( $generatedQuery) gs ON gs.cid = ui.cid
-			WHERE (gs.amount - uw.amount) > 0
+		 	LEFT JOIN `uni_monthly` um ON um.cid = gs.cid
+
+			WHERE (gs.amount - IFNULL(um.amount, 0)) > 0
 			)
 		";
 
@@ -123,8 +125,8 @@ class DB_UnilevelEarning {
 	}
 
 	public static function save_information($arrayValues){
-		self::upsert_uni_monthly($arrayValues);
 		self::add_uni_history($arrayValues);
+		self::upsert_uni_monthly($arrayValues);
 		self::update_uni_wallet($arrayValues);
 	}
 }
