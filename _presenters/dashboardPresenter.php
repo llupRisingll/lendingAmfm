@@ -1,6 +1,8 @@
 <?php
 class dashboardPresenter {
     public static function get(){
+    	SessionModel::restrictNotLogged();
+
         View::addVar("view_title", "Dashboard");
 
         // Import Jquery JS Library

@@ -1,6 +1,8 @@
 <?php
 class WithdrawalsPresenter {
     public function get(){
+	    SessionModel::restrictNotLogged();
+
     	View::addVar("view_title", "Withdrawal Requests");
 
 	    // Import Jquery JS Library

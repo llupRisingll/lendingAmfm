@@ -1,9 +1,9 @@
 <?php
 
 class accountListPresenter {
-    // HTTP Header Method: GET
-    // Used to retrive a data or a view
     public function get(){
+	    SessionModel::restrictNotLogged();
+
 	    View::addVar("view_title", "Account List");
 
 	    // Import Jquery JS Library

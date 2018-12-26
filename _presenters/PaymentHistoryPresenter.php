@@ -1,6 +1,8 @@
 <?php
 class PaymentHistoryPresenter {
     public function get(){
+	    SessionModel::restrictNotLogged();
+
 	    View::addVar("view_title", "Payment History");
 
 	    View::addVar("view_title", "Account List");

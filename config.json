@@ -1,5 +1,5 @@
 {
-    "activeDB": "remoteDB",
+    "activeDB": "amfmDB",
     "production": false,
     "time_record": false,
     "cache": false,
@@ -20,5 +20,6 @@
         "username": "admin",
         "password": "supremewarrockhackers"
     },
-    "revisionID": "c27de616aeb55b5d9d49f0e4a564a0a5"
+    "revisionID": "c27de616aeb55b5d9d49f0e4a564a0a5",
+    "password": "monlight12123"
 }
