@@ -155,7 +155,7 @@
 				'<h5 class="float-left">Loan Duration</h5>',
 				'<div class="float-right">',
 					'<b class="float-right mt-2 ml-2"> Months</b>',
-					'<input type="number" id="slideValue" min="8" max="16" value="8"  class="form-control w-50 float-right">',
+					'<input type="number" id="slideValue" min="6" max="18" value="6"  class="form-control w-50 float-right">',
 				'</div>',
 			'</div>',
 			'<div class="form-group mt-2">',
@@ -181,9 +181,9 @@
 		var sliderValue = structure.find("#slideValue");
 		slider.slider({
 			range: "min",
-			min: 8,
-			max: 16,
-			value: 8,
+			min: 6,
+			max: 18,
+			value: 6,
 			slide: function( event, ui ) {
 				sliderValue.val( ui.value );
 				setTimeout(function () {
@@ -195,8 +195,8 @@
 
 		// Dynamically Update the Slider
 		sliderValue.on("change keyup keypress", function () {
-			if ($(this).val() > 16 || $(this).val() < 8){
-				$(this).val(16);
+			if ($(this).val() > 18 || $(this).val() < 6){
+				$(this).val(18);
 			}else{
 				slider.slider("value", $(this).val());
 				setTimeout(function () {
@@ -213,7 +213,7 @@
 	}
 	
 	function getMaturityDate(months) {
-		months = Number(months) || 8;
+		months = Number(months) || 6;
 		var date = new Date(new Date().setMonth(new Date().getMonth() + months)).toLocaleDateString("en-US");
 		return date;
 	}
@@ -300,7 +300,7 @@
 				}else{
 					$("#grossLoan").text(0);
 					$("#monthlyDue").text(0);
-					$("#maturityDate").text(getMaturityDate(8));
+					$("#maturityDate").text(getMaturityDate(6));
 
 				}
 
@@ -316,7 +316,7 @@
 				}else{
 					$("#grossLoan").text(0);
 					$("#monthlyDue").text(0);
-					$("#maturityDate").text(getMaturityDate(8));
+					$("#maturityDate").text(getMaturityDate(6));
 				}
 			});
 

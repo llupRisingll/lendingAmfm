@@ -176,7 +176,7 @@ class TransactionsModel {
 		}
 	}
 
-	private static function grossLoan($loanAmount, $durationMonths=8){
+	private static function grossLoan($loanAmount, $durationMonths=6){
 		// Generate Total GrossLoan According to the loanAmount
 		$interest = 0.05;
 		return ceil((1+ ($interest * $durationMonths)) * $loanAmount);
