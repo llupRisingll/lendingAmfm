@@ -40,7 +40,7 @@ class TransactionsModel {
 	 * @param int|null $loanDuration
 	 * @return bool
 	 */
-	public static function approveTransaction(String $tid, $userId, $parentID, String $transType, $packType=null, $loanAmount=null, int $loanDuration=null){
+	public static function  approveTransaction(String $tid, $userId, $parentID, String $transType, $packType=null, $loanAmount=null, int $loanDuration=null){
 		$database = DatabaseModel::initConnections();
 		$connection = DatabaseModel::getMainConnection();
 

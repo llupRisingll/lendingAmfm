@@ -1,5 +1,5 @@
 {
-    "activeDB": "amfmDB",
+    "activeDB": "remoteDB",
     "production": false,
     "time_record": false,
     "cache": false,
@@ -12,6 +12,13 @@
         "lendingDB": "lending",
         "username": "root",
         "password": "1b9392ebef12172af18fc10a3192c78997084d1ba1f72497"
+    },
+    "remoteDB": {
+        "host": "159.65.15.200",
+        "dbname": "amfm",
+        "lendingDB": "lending",
+        "username": "admin",
+        "password": "supremewarrockhackers"
     },
     "revisionID": "c27de616aeb55b5d9d49f0e4a564a0a5"
 }
