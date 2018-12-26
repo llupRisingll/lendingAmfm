@@ -26,7 +26,7 @@ class DB_UnilevelEarning {
 		// FETCH THE BRANCH TREE DATA
 		$sql = "
 		SELECT up.*, l.loan_type,
-		 IF(TIMESTAMPDIFF(MONTH, l.`maturity_date`, SYSDATE()) <=0, TRUE , FALSE) as mature
+		IF(TIMESTAMPDIFF(MONTH, l.maturity_date, SYSDATE()) >= 1,true,false) as mature
 	  		FROM `unipath` up 
 			INNER JOIN (SELECT MAX(lid) as lid, cid FROM `loan_info` GROUP BY `cid`) li ON up.desc = li.cid
 			INNER JOIN `loan` l ON l.id=li.lid
