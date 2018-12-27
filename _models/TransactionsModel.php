@@ -102,7 +102,7 @@ class TransactionsModel {
 				// Add to the uni path / Plot the Data
 				$prepared = $database->mysqli_prepare($connection, "
               	INSERT INTO `unipath`(`anc`, `desc`, `parent`)
-					(SELECT `anc`, :USER_ID AS `desc`, :PARENT_ID AS `parent` FROM `binpath` WHERE `desc`=:PARENT_ID) 
+					(SELECT `anc`, :USER_ID AS `desc`, :PARENT_ID AS `parent` FROM `unipath` WHERE `desc`=:PARENT_ID) 
 						UNION
  					(SELECT :USER_ID AS `enc`, :USER_ID AS `desc`, :PARENT_ID AS `parent`) 
  						ON DUPLICATE KEY UPDATE `parent`= :PARENT_ID;

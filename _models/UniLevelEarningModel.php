@@ -97,9 +97,13 @@ class UniLevelEarningModel {
 
 	public static function compute_total_earnings($userID){
 		$parentList = DB_UnilevelEarning::fetch_unilevel_parents($userID);
-
 		$directEarning = [];
+
 		foreach ($parentList as $parent){
+			if (!isset($directEarning[$parent])){
+				$directEarning[$parent] = 0;
+			}
+
 			self::classify_tree_levels($parent, function ($nodes) use ($parent, &$directEarning) {
 				$directEarning[$parent] += self::compute_direct_earning($nodes, $parent);
 			});
