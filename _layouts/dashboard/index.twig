@@ -356,12 +356,16 @@
 
 {# Modal Javascript Algorithm #}
 <script type="text/javascript">
-    function errorMethod() {
+    function errorMethod(self) {
 	    {# Show the Server Error #}
 	    alert("Server Error: An internet connection distortion occur while trying to send your request. Please try again later");
+
+	    self.text(self.data("original-text"));
+	    self.attr("disabled", "");
     }
 
     $("#decline .decline").on("click", function () {
+    	var self = $(this);
 	    var dataID = $(this).data("id");
 
 	    {# Ajax Request to the binary request #}
@@ -370,7 +374,10 @@
 		    type: "POST",
 		    data: {"decline": dataID},
 		    beforeSend: function () {
-		    	// Sending Please wait...
+			    var countdownText = "Please wait...";
+			    self.data("original-text", self.text());
+			    self.attr("disabled", "disabled");
+			    self.text(countdownText);
 		    }
 	    })
 
@@ -383,13 +390,16 @@
 		    }
 
 		    {# Show server error message #}
-		    errorMethod();
+		    errorMethod(self);
 	    });
 
-	    JQXHR.fail(errorMethod);
+	    JQXHR.fail(function () {
+		    errorMethod(self);
+	    });
     });
 
     $("#approve .approve").on("click", function () {
+	    var self = $(this);
         var dataID = $(this).attr("data-id");
         var dataType = $(this).attr("data-type");
         var userID = $(this).attr("data-user_id");
@@ -437,7 +447,10 @@
 
 		    },
 		    beforeSend: function () {
-			    // Sending Please wait...
+			    var countdownText = "Please wait...";
+			    self.data("original-text", self.text());
+			    self.attr("disabled", "disabled");
+			    self.text(countdownText);
 		    }
 	    })
 
@@ -450,9 +463,11 @@
 		    }
 
 		    {# Show server error message #}
-		    errorMethod();
+		    errorMethod(self);
 	    });
 
-	    JQXHR.fail(errorMethod);
+	    JQXHR.fail(function () {
+		    errorMethod(self);
+	    });
     });
 </script>

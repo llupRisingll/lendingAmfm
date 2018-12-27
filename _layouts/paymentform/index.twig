@@ -94,6 +94,15 @@
 </div>
 
 <script type="text/javascript">
+
+	$("button[type='submit']").on("click", function () {
+		var self = $(this);
+		var countdownText = "Please wait...";
+		self.text(countdownText);
+		self.attr("disabled", "disabled");
+		self.parents("form").submit();
+	});
+
 	function tableRow(title, content){
 		return $("<tr/>").append([
 			$("<td/>", {class: "font-weight-bold", text: title}),
