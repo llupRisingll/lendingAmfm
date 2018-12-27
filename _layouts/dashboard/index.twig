@@ -361,7 +361,7 @@
 	    alert("Server Error: An internet connection distortion occur while trying to send your request. Please try again later");
 
 	    self.text(self.data("original-text"));
-	    self.attr("disabled", "");
+	    self.removeAttr("disabled")
     }
 
     $("#decline .decline").on("click", function () {
