@@ -93,26 +93,38 @@ class TransactionsModel {
 			else{
 				// Activate the uni level account
 				$prepared = $database->mysqli_prepare($connection,
-					"UPDATE `accounts` SET `uni_active`='1' WHERE `id`=:USER_ID;"
+					"SELECT `uni_active` FROM `accounts` WHERE `id`=:USER_ID LIMIT 1;"
 				);
 				$database->mysqli_execute($prepared, array(
 					":USER_ID" => $userId
 				));
 
-				// Add to the uni path / Plot the Data
-				$prepared = $database->mysqli_prepare($connection, "
-              	INSERT INTO `unipath`(`anc`, `desc`, `parent`)
-					(SELECT `anc`, :USER_ID AS `desc`, :PARENT_ID AS `parent` FROM `unipath` WHERE `desc`=:PARENT_ID) 
-						UNION
- 					(SELECT :USER_ID AS `enc`, :USER_ID AS `desc`, :PARENT_ID AS `parent`) 
- 						ON DUPLICATE KEY UPDATE `parent`= :PARENT_ID;
+				// Prepare the dataArray algorithm by adding extra column
+				$uni_active = $database->mysqli_fetch_assoc($prepared)[0]["uni_active"];
+
+				if ($uni_active != 1){
+					// Activate the uni level account
+					$prepared = $database->mysqli_prepare($connection,
+						"UPDATE `accounts` SET `uni_active`='1' WHERE `id`=:USER_ID;"
+					);
+					$database->mysqli_execute($prepared, array(
+						":USER_ID" => $userId
+					));
+
+					// Add to the uni path / Plot the Data
+
+					$prepared = $database->mysqli_prepare($connection, "
+                    INSERT INTO `unipath`(`anc`, `desc`, `parent`)
+						(SELECT `anc`, :USER_ID AS `desc`, :PARENT_ID AS `parent` FROM `unipath` WHERE `desc`=:PARENT_ID) 
+							UNION
+	                    (SELECT :USER_ID AS `enc`, :USER_ID AS `desc`, :PARENT_ID AS `parent`) 
+	                        ON DUPLICATE KEY UPDATE `parent`= :PARENT_ID;
             		");
-
-
-				$database->mysqli_execute($prepared, array(
-					":USER_ID" => $userId,
-					":PARENT_ID" => $parentID
-				));
+					$database->mysqli_execute($prepared, array(
+						":USER_ID" => $userId,
+						":PARENT_ID" => $parentID
+					));
+				}
 
 				// Save the loan
 				$prepared = $database->mysqli_prepare($connection, "
@@ -141,18 +153,20 @@ class TransactionsModel {
 				));
 
 				// Create eWallet
-				$prepared = $database->mysqli_prepare($connection,
-					"INSERT INTO `uni_wallet`(`amount`, `balance`, `paid`) VALUES (0,0,0)"
-				);
-				$database->mysqli_execute($prepared, array());
+				if ($uni_active != 1){
+					$prepared = $database->mysqli_prepare($connection,
+						"INSERT INTO `uni_wallet`(`amount`, `balance`, `paid`) VALUES (0,0,0)"
+					);
+					$database->mysqli_execute($prepared, array());
 
-				$prepared = $database->mysqli_prepare($connection,
-					"INSERT INTO `uni_info`(`uwid`, `cid`) VALUES (:WALLET_ID,:CLIENT_ID)"
-				);
-				$database->mysqli_execute($prepared, array(
-					":WALLET_ID" => $database->mysqli_insert_id($connection),
-					":CLIENT_ID" => $userId
-				));
+					$prepared = $database->mysqli_prepare($connection,
+						"INSERT INTO `uni_info`(`uwid`, `cid`) VALUES (:WALLET_ID,:CLIENT_ID)"
+					);
+					$database->mysqli_execute($prepared, array(
+						":WALLET_ID" => $database->mysqli_insert_id($connection),
+						":CLIENT_ID" => $userId
+					));
+				}
 
 				// Save the Earnings
 				$total_earnings = UniLevelEarningModel::compute_total_earnings($userId);
